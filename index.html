@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WHO'S THE IMPOSTOR?</title>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Fredoka', sans-serif;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(124,58,237,.22), transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(236,72,153,.18), transparent 30%),
+        #09090f;
+    color: white;
+    overflow-x: hidden;
+}
+
+button,
+input {
+    font-family: inherit;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+}
+
+#app {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.screen {
+    width: 100%;
+    max-width: 520px;
+    display: none;
+    animation: fadeIn .45s ease;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo .emoji {
+    font-size: 65px;
+    display: block;
+    animation: float 2.5s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+}
+
+.logo h1 {
+    font-size: clamp(35px, 10vw, 58px);
+    line-height: .95;
+    font-weight: 700;
+    letter-spacing: -2px;
+}
+
+.logo h1 span {
+    color: #a78bfa;
+}
+
+.logo p {
+    margin-top: 10px;
+    color: #aaa;
+    font-size: 15px;
+}
+
+.card {
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 25px;
+    padding: 25px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+
+.btn {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 15px;
+    font-size: 17px;
+    font-weight: 600;
+    color: white;
+    transition: .2s;
+    margin-top: 12px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.btn:active {
+    transform: scale(.97);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    box-shadow: 0 8px 25px rgba(124,58,237,.3);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,.08);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.input {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(0,0,0,.25);
+    color: white;
+    outline: none;
+    font-size: 17px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.input:focus {
+    border-color: #a78bfa;
+}
+
+.label {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,.1);
+}
+
+.room-code {
+    text-align: center;
+    font-size: 43px;
+    letter-spacing: 8px;
+    color: #c4b5fd;
+    font-weight: 700;
+    margin: 10px 0;
+}
+
+.status {
+    text-align: center;
+    margin-top: 18px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #facc15;
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    50% { opacity: .3; }
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.round {
+    color: #aaa;
+    font-size: 14px;
+}
+
+.timer {
+    background: rgba(255,255,255,.08);
+    padding: 8px 13px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.timer.warning {
+    color: #f87171;
+}
+
+.question {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.role-card {
+    text-align: center;
+    padding: 28px 20px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    background: linear-gradient(
+        145deg,
+        rgba(124,58,237,.18),
+        rgba(168,85,247,.07)
+    );
+    border: 1px solid rgba(167,139,250,.18);
+}
+
+.role-icon {
+    font-size: 65px;
+    margin-bottom: 10px;
+}
+
+.role-name {
+    font-size: 29px;
+    font-weight: 700;
+}
+
+.role-description {
+    color: #aaa;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.secret-box {
+    margin-top: 20px;
+    padding: 18px;
+    background: rgba(0,0,0,.25);
+    border-radius: 15px;
+}
+
+.secret-label {
+    color: #777;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.secret {
+    font-size: 30px;
+    color: #f5f5f5;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.clue-box {
+    background: rgba(255,255,255,.045);
+    border-radius: 17px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.player-label {
+    color: #a78bfa;
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+.clue {
+    font-size: 21px;
+    min-height: 30px;
+}
+
+.waiting {
+    text-align: center;
+    color: #888;
+    padding: 25px 0 5px;
+}
+
+.vote-title {
+    text-align: center;
+    font-size: 25px;
+    margin-bottom: 20px;
+}
+
+.vote-btn {
+    width: 100%;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.1);
+    color: white;
+    padding: 18px;
+    border-radius: 16px;
+    margin-top: 10px;
+    font-size: 18px;
+    transition: .2s;
+}
+
+.vote-btn:hover {
+    background: rgba(124,58,237,.25);
+    border-color: #8b5cf6;
+}
+
+.result-icon {
+    text-align: center;
+    font-size: 75px;
+    margin-bottom: 10px;
+}
+
+.result-title {
+    text-align: center;
+    font-size: 34px;
+}
+
+.result-sub {
+    text-align: center;
+    color: #aaa;
+    margin-top: 8px;
+    line-height: 1.5;
+}
+
+.score-board {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.score {
+    flex: 1;
+    padding: 15px;
+    background: rgba(255,255,255,.05);
+    border-radius: 15px;
+    text-align: center;
+}
+
+.score-name {
+    color: #aaa;
+    font-size: 13px;
+}
+
+.score-number {
+    font-size: 30px;
+    font-weight: 700;
+    color: #c4b5fd;
+}
+
+.small {
+    font-size: 13px;
+    color: #777;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.error {
+    color: #f87171;
+    text-align: center;
+    font-size: 14px;
+    margin-top: 12px;
+    min-height: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.player-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    background: rgba(255,255,255,.06);
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.green {
+    color: #4ade80;
+}
+
+.red {
+    color: #f87171;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    resize: none;
+    background: rgba(0,0,0,.25);
+    border: 1px solid rgba(255,255,255,.1);
+    color: white;
+    border-radius: 15px;
+    padding: 15px;
+    font-family: inherit;
+    font-size: 17px;
+    outline: none;
+}
+
+textarea:focus {
+    border-color: #8b5cf6;
+}
+
+.reveal-box {
+    margin-top: 20px;
+    text-align: center;
+    padding: 20px;
+    background: rgba(255,255,255,.05);
+    border-radius: 16px;
+}
+
+.reveal-box strong {
+    color: #c4b5fd;
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<!-- HOME -->
+<section id="home" class="screen active">
+
+    <div class="logo">
+        <span class="emoji">🕵️</span>
+        <h1>WHO'S THE<br><span>IMPOSTOR?</span></h1>
+        <p>dua orang. satu impostor. jangan sampai ketahuan.</p>
+    </div>
+
+    <div class="card">
+
+        <input
+            id="nameInput"
+            class="input"
+            maxlength="15"
+            placeholder="Nama lu..."
+        >
+
+        <button class="btn btn-primary" onclick="createRoom()">
+            🎮 CREATE ROOM
+        </button>
+
+        <div class="divider">ATAU</div>
+
+        <input
+            id="roomInput"
+            class="input"
+            maxlength="5"
+            placeholder="Kode room"
+            style="text-transform:uppercase"
+        >
+
+        <button class="btn btn-secondary" onclick="joinRoom()">
+            🚪 JOIN ROOM
+        </button>
+
+        <div id="homeError" class="error"></div>
+
+        <div class="small">
+            Game khusus 2 pemain • masing-masing pakai HP sendiri
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ROOM -->
+<section id="room" class="screen">
+
+    <div class="logo" style="margin-bottom:20px">
+        <span class="emoji" style="font-size:45px">🔐</span>
+        <h1 style="font-size:38px">ROOM</h1>
+    </div>
+
+    <div class="card">
+
+        <div class="label" style="text-align:center">
+            KIRIM KODE INI KE TEMEN LU
+        </div>
+
+        <div id="roomCode" class="room-code">
+            -----
+        </div>
+
+        <button class="btn btn-secondary" onclick="copyRoom()">
+            📋 COPY ROOM CODE
+        </button>
+
+        <div class="status" id="roomStatus">
+            <span class="dot"></span>
+            Nunggu player kedua...
+        </div>
+
+        <div style="margin-top:25px;text-align:center">
+            <div class="player-pill">
+                🟢 <span id="hostName">Player 1</span>
+            </div>
+
+            <div style="margin:12px;color:#555">VS</div>
+
+            <div class="player-pill" id="guestPill">
+                ⚪ Menunggu...
+            </div>
+        </div>
+
+        <button class="btn btn-danger" onclick="backHome()">
+            LEAVE ROOM
+        </button>
+
+    </div>
+</section>
+
+
+<!-- ROLE -->
+<section id="role" class="screen">
+
+    <div class="topbar">
+        <div class="round">ROUND <span id="roundNumber">1</span></div>
+        <div class="timer" id="roleTimer">10s</div>
+    </div>
+
+    <div class="card">
+
+        <div class="role-card">
+
+            <div id="roleIcon" class="role-icon">🕵️</div>
+
+            <div id="roleName" class="role-name">
+                IMPOSTOR
+            </div>
+
+            <div id="roleDescription" class="role-description">
+                Jangan sampai ketahuan.
+            </div>
+
+            <div class="secret-box">
+
+                <div class="secret-label">
+                    KATA RAHASIA LU
+                </div>
+
+                <div id="secretWord" class="secret">
+                    ???
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="small">
+            Hafalin kata lu. Jangan kasih lihat layar ke lawan.
+        </div>
+
+    </div>
+</section>
+
+
+<!-- CLUE -->
+<section id="clue" class="screen">
+
+    <div class="topbar">
+        <div class="round">CLUE ROUND</div>
+        <div class="timer" id="clueTimer">30s</div>
+    </div>
+
+    <div class="card">
+
+        <div class="question">
+            💬 Kasih satu clue tentang kata lu
+        </div>
+
+        <textarea
+            id="clueInput"
+            maxlength="80"
+            placeholder="contoh: sering ada di rumah..."
+        ></textarea>
+
+        <button class="btn btn-primary" onclick="sendClue()">
+            SEND CLUE →
+        </button>
+
+        <div id="clueError" class="error"></div>
+
+        <div class="waiting hidden" id="clueWaiting">
+            ⏳ Nunggu clue lawan...
+        </div>
+
+    </div>
+</section>
+
+
+<!-- VOTE -->
+<section id="vote" class="screen">
+
+    <div class="card">
+
+        <div class="vote-title">
+            🧐 Siapa impostornya?
+        </div>
+
+        <div id="cluePlayer1" class="clue-box">
+            <div class="player-label">PLAYER 1</div>
+            <div class="clue">...</div>
+        </div>
+
+        <div id="cluePlayer2" class="clue-box">
+            <div class="player-label">PLAYER 2</div>
+            <div class="clue">...</div>
+        </div>
+
+        <div class="label" style="text-align:center;margin-top:20px">
+            PILIH ORANG YANG MENURUT LU IMPOSTOR
+        </div>
+
+        <div id="voteButtons"></div>
+
+        <div id="voteStatus" class="waiting hidden">
+            ⏳ Nunggu lawan vote...
+        </div>
+
+    </div>
+</section>
+
+
+<!-- RESULT -->
+<section id="result" class="screen">
+
+    <div class="card">
+
+        <div id="resultIcon" class="result-icon">
+            🎭
+        </div>
+
+        <div id="resultTitle" class="result-title">
+            ...
+        </div>
+
+        <div id="resultSub" class="result-sub">
+            ...
+        </div>
+
+        <div class="reveal-box">
+            IMPOSTOR SEBENARNYA
+            <br>
+            <strong id="actualImpostor">...</strong>
+        </div>
+
+        <div class="score-board">
+
+            <div class="score">
+                <div class="score-name" id="scoreName1">
+                    Player 1
+                </div>
+                <div class="score-number" id="score1">
+                    0
+                </div>
+            </div>
+
+            <div class="score">
+                <div class="score-name" id="scoreName2">
+                    Player 2
+                </div>
+                <div class="score-number" id="score2">
+                    0
+                </div>
+            </div>
+
+        </div>
+
+        <button class="btn btn-primary" onclick="playAgain()">
+            🔄 PLAY AGAIN
+        </button>
+
+        <button class="btn btn-secondary" onclick="backHome()">
+            🏠 BACK TO HOME
+        </button>
+
+    </div>
+</section>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   GAME DATA
+========================================================= */
+
+const WORDS = [
+    ["Kucing", "Anjing"],
+    ["Pizza", "Burger"],
+    ["Sekolah", "Kampus"],
+    ["Pantai", "Kolam Renang"],
+    ["Kopi", "Teh"],
+    ["Motor", "Mobil"],
+    ["Kamera", "HP"],
+    ["Hujan", "Salju"],
+    ["Gunung", "Bukit"],
+    ["Nasi Goreng", "Mie Goreng"],
+    ["Kucing", "Harimau"],
+    ["Bola", "Basket"],
+    ["Instagram", "TikTok"],
+    ["YouTube", "Netflix"],
+    ["Es Krim", "Cake"],
+    ["Sepatu", "Sandal"],
+    ["Laptop", "Komputer"],
+    ["Dokter", "Perawat"],
+    ["Guru", "Dosen"],
+    ["Buku", "Komik"]
+];
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let peer = null;
+let conn = null;
+
+let isHost = false;
+let myId = null;
+let myName = "";
+let opponentName = "";
+
+let roomCode = "";
+
+let myRole = "";
+let myWord = "";
+
+let currentRound = 1;
+
+let myClue = "";
+let opponentClue = "";
+
+let myVote = null;
+let opponentVote = null;
+
+let scores = {
+    player1: 0,
+    player2: 0
+};
+
+let timerInterval = null;
+
+
+/* =========================================================
+   SCREEN
+========================================================= */
+
+function showScreen(id) {
+
+    document.querySelectorAll(".screen").forEach(screen => {
+        screen.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+
+    window.scrollTo(0,0);
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function generateRoomCode() {
+
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    let result = "";
+
+    for(let i = 0; i < 5; i++) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    return result;
+}
+
+
+function getName() {
+
+    const input = document.getElementById("nameInput");
+
+    const name = input.value.trim();
+
+    if(!name) {
+        showHomeError("Isi nama lu dulu 😭");
+        return null;
+    }
+
+    return name.substring(0,15);
+}
+
+
+function showHomeError(text) {
+    document.getElementById("homeError").textContent = text;
+}
+
+
+function clearHomeError() {
+    document.getElementById("homeError").textContent = "";
+}
+
+
+function send(data) {
+
+    if(conn && conn.open) {
+        conn.send(data);
+    }
+}
+
+
+/* =========================================================
+   CREATE ROOM
+========================================================= */
+
+function createRoom() {
+
+    clearHomeError();
+
+    const name = getName();
+
+    if(!name) return;
+
+    myName = name;
+    isHost = true;
+
+    roomCode = generateRoomCode();
+
+    myId = "IMPOSTOR-" + roomCode;
+
+    peer = new Peer(myId, {
+        debug: 0
+    });
+
+    peer.on("open", () => {
+
+        document.getElementById("roomCode").textContent = roomCode;
+        document.getElementById("hostName").textContent = myName;
+
+        showScreen("room");
+    });
+
+
+    peer.on("connection", connection => {
+
+        if(conn) return;
+
+        conn = connection;
+
+        setupConnection();
+
+    });
+
+
+    peer.on("error", err => {
+
+        console.error(err);
+
+        showHomeError(
+            "Gagal bikin room. Coba refresh halaman."
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   JOIN ROOM
+========================================================= */
+
+function joinRoom() {
+
+    clearHomeError();
+
+    const name = getName();
+
+    if(!name) return;
+
+    const code =
+        document.getElementById("roomInput")
+        .value
+        .trim()
+        .toUpperCase();
+
+    if(code.length !== 5) {
+
+        showHomeError(
+            "Kode room harus 5 karakter."
+        );
+
+        return;
+    }
+
+    myName = name;
+    roomCode = code;
+    isHost = false;
+
+    peer = new Peer(undefined, {
+        debug: 0
+    });
+
+    peer.on("open", id => {
+
+        myId = id;
+
+        conn = peer.connect(
+            "IMPOSTOR-" + roomCode,
+            {
+                reliable: true
+            }
+        );
+
+        setupConnection();
+
+    });
+
+
+    peer.on("error", err => {
+
+        console.error(err);
+
+        showHomeError(
+            "Room nggak ditemukan atau udah ditutup."
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   CONNECTION
+========================================================= */
+
+function setupConnection() {
+
+    conn.on("open", () => {
+
+        send({
+            type: "join",
+            name: myName
+        });
+
+        if(!isHost) {
+
+            showScreen("room");
+
+            document.getElementById("roomCode")
+                .textContent = roomCode;
+
+            document.getElementById("hostName")
+                .textContent = "Player 1";
+
+            document.getElementById("roomStatus")
+                .innerHTML =
+                '<span class="dot"></span> Terhubung!';
+
+        }
+
+    });
+
+
+    conn.on("data", data => {
+
+        handleData(data);
+
+    });
+
+
+    conn.on("close", () => {
+
+        alert(
+            "Koneksi dengan lawan terputus 😭"
+        );
+
+        backHome();
+
+    });
+
+}
+
+
+/* =========================================================
+   DATA HANDLER
+========================================================= */
+
+function handleData(data) {
+
+    switch(data.type) {
+
+        case "join":
+
+            if(isHost) {
+
+                opponentName = data.name;
+
+                document.getElementById("guestPill")
+                    .innerHTML =
+                    "🟢 " + opponentName;
+
+                document.getElementById("roomStatus")
+                    .innerHTML =
+                    '<span class="green">●</span> Player lengkap! Memulai game...';
+
+                setTimeout(startGame, 1200);
+
+            }
+
+            break;
+
+
+        case "gameStart":
+
+            receiveGameStart(data);
+
+            break;
+
+
+        case "clue":
+
+            opponentClue = data.clue;
+
+            if(data.player === "host") {
+
+                document.querySelector(
+                    "#cluePlayer1 .clue"
+                ).textContent = data.clue;
+
+            } else {
+
+                document.querySelector(
+                    "#cluePlayer2 .clue"
+                ).textContent = data.clue;
+
+            }
+
+            checkBothClues();
+
+            break;
+
+
+        case "vote":
+
+            opponentVote = data.vote;
+
+            checkVotes();
+
+            break;
+
+
+        case "playAgain":
+
+            if(isHost) {
+
+                startGame();
+
+            }
+
+            break;
+
+    }
+
+}
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+function startGame() {
+
+    if(!isHost) return;
+
+    currentRound++;
+
+    const pair =
+        WORDS[
+            Math.floor(Math.random() * WORDS.length)
+        ];
+
+    const impostorIsPlayer2 =
+        Math.random() < 0.5;
+
+    let gameData = {
+
+        type: "gameStart",
+
+        round: currentRound,
+
+        player1: {
+            role: impostorIsPlayer2
+                ? "civilian"
+                : "impostor",
+
+            word: pair[0]
+        },
+
+        player2: {
+            role: impostorIsPlayer2
+                ? "impostor"
+                : "civilian",
+
+            word: pair[1]
+        }
+
+    };
+
+
+    myRole = gameData.player1.role;
+    myWord = gameData.player1.word;
+
+    send(gameData);
+
+    showRole();
+
+}
+
+
+/* =========================================================
+   RECEIVE GAME
+========================================================= */
+
+function receiveGameStart(data) {
+
+    currentRound = data.round;
+
+    myRole = data.player2.role;
+    myWord = data.player2.word;
+
+    showRole();
+
+}
+
+
+/* =========================================================
+   ROLE SCREEN
+========================================================= */
+
+function showRole() {
+
+    document.getElementById("roundNumber")
+        .textContent = currentRound;
+
+    if(myRole === "impostor") {
+
+        document.getElementById("roleIcon")
+            .textContent = "🕵️";
+
+        document.getElementById("roleName")
+            .textContent = "IMPOSTOR";
+
+        document.getElementById("roleDescription")
+            .textContent =
+            "Lu nggak punya kata yang sama. Jangan sampai ketahuan.";
+
+    } else {
+
+        document.getElementById("roleIcon")
+            .textContent = "🟢";
+
+        document.getElementById("roleName")
+            .textContent = "CIVILIAN";
+
+        document.getElementById("roleDescription")
+            .textContent =
+            "Cari tahu siapa yang punya kata berbeda.";
+
+    }
+
+    document.getElementById("secretWord")
+        .textContent = myWord;
+
+    showScreen("role");
+
+    startTimer(
+        10,
+        document.getElementById("roleTimer"),
+        () => {
+
+            showClueScreen();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   CLUE
+========================================================= */
+
+function showClueScreen() {
+
+    myClue = "";
+    opponentClue = "";
+
+    myVote = null;
+    opponentVote = null;
+
+    document.getElementById("clueInput").value = "";
+
+    document.getElementById("clueWaiting")
+        .classList.add("hidden");
+
+    showScreen("clue");
+
+    startTimer(
+        30,
+        document.getElementById("clueTimer"),
+        () => {
+
+            if(!myClue) {
+
+                document.getElementById("clueInput")
+                    .value =
+                    "nggak kepikiran 😭";
+
+                sendClue();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SEND CLUE
+========================================================= */
+
+function sendClue() {
+
+    const input =
+        document.getElementById("clueInput");
+
+    const clue = input.value.trim();
+
+    if(!clue) {
+
+        document.getElementById("clueError")
+            .textContent =
+            "Clue jangan kosong dong 😭";
+
+        return;
+
+    }
+
+    myClue = clue.substring(0,80);
+
+    send({
+
+        type: "clue",
+
+        clue: myClue,
+
+        player: isHost
+            ? "host"
+            : "guest"
+
+    });
+
+    input.disabled = true;
+
+    document.querySelector(
+        "#clue .btn-primary"
+    ).disabled = true;
+
+    document.getElementById("clueWaiting")
+        .classList.remove("hidden");
+
+    checkBothClues();
+
+}
+
+
+/* =========================================================
+   BOTH CLUES
+========================================================= */
+
+function checkBothClues() {
+
+    if(!myClue || !opponentClue) return;
+
+    clearInterval(timerInterval);
+
+    showVoteScreen();
+
+}
+
+
+/* =========================================================
+   VOTE SCREEN
+========================================================= */
+
+function showVoteScreen() {
+
+    document.querySelector(
+        "#cluePlayer1 .clue"
+    ).textContent =
+        isHost ? myClue : opponentClue;
+
+    document.querySelector(
+        "#cluePlayer2 .clue"
+    ).textContent =
+        isHost ? opponentClue : myClue;
+
+
+    document.querySelector(
+        "#cluePlayer1 .player-label"
+    ).textContent =
+        (isHost ? myName : opponentName) +
+        " • PLAYER 1";
+
+
+    document.querySelector(
+        "#cluePlayer2 .player-label"
+    ).textContent =
+        (isHost ? opponentName : myName) +
+        " • PLAYER 2";
+
+
+    const buttons =
+        document.getElementById("voteButtons");
+
+    buttons.innerHTML = "";
+
+
+    const player1Name =
+        isHost ? myName : opponentName;
+
+    const player2Name =
+        isHost ? opponentName : myName;
+
+
+    const b1 =
+        document.createElement("button");
+
+    b1.className = "vote-btn";
+
+    b1.textContent =
+        "🔴 " + player1Name;
+
+    b1.onclick = () =>
+        castVote(1);
+
+    buttons.appendChild(b1);
+
+
+    const b2 =
+        document.createElement("button");
+
+    b2.className = "vote-btn";
+
+    b2.textContent =
+        "🔴 " + player2Name;
+
+    b2.onclick = () =>
+        castVote(2);
+
+    buttons.appendChild(b2);
+
+
+    showScreen("vote");
+
+}
+
+
+/* =========================================================
+   CAST VOTE
+========================================================= */
+
+function castVote(playerNumber) {
+
+    if(myVote) return;
+
+    myVote = playerNumber;
+
+    send({
+        type: "vote",
+        vote: playerNumber
+    });
+
+
+    document.querySelectorAll(".vote-btn")
+        .forEach(btn => {
+
+            btn.disabled = true;
+            btn.style.opacity = ".5";
+
+        });
+
+
+    document.getElementById("voteStatus")
+        .classList.remove("hidden");
+
+    checkVotes();
+
+}
+
+
+/* =========================================================
+   CHECK VOTES
+========================================================= */
+
+function checkVotes() {
+
+    if(!myVote || !opponentVote) return;
+
+    clearInterval(timerInterval);
+
+    calculateResult();
+
+}
+
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+function calculateResult() {
+
+    /*
+       player 1 = host
+       player 2 = guest
+
+       Cari siapa impostor berdasarkan
+       role host/guest.
+    */
+
+    const impostor =
+        isHost
+            ? (myRole === "impostor" ? 1 : 2)
+            : (myRole === "impostor" ? 2 : 1);
+
+
+    let p1Correct =
+        myVote === impostor;
+
+    let p2Correct =
+        opponentVote === impostor;
+
+
+    /*
+       Karena masing-masing player punya
+       vote mereka sendiri, kita perlu
+       mengubah vote sesuai perspektif.
+    */
+
+    let hostVote =
+        isHost ? myVote : opponentVote;
+
+    let guestVote =
+        isHost ? opponentVote : myVote;
+
+
+    let hostCorrect =
+        hostVote === impostor;
+
+    let guestCorrect =
+        guestVote === impostor;
+
+
+    /*
+       Civilian yang berhasil menemukan
+       impostor dapat +1.
+
+       Impostor menang jika berhasil
+       membuat civilian salah vote.
+    */
+
+    if(hostCorrect) {
+
+        scores.player1++;
+
+    }
+
+    if(guestCorrect) {
+
+        scores.player2++;
+
+    }
+
+
+    const civilianWon =
+        hostCorrect || guestCorrect;
+
+
+    let title = "";
+    let icon = "";
+    let sub = "";
+
+
+    if(civilianWon) {
+
+        icon = "🎉";
+        title = "IMPOSTOR KETANGKAP!";
+
+        sub =
+            "Setidaknya satu orang berhasil membaca situasi dengan benar.";
+
+    } else {
+
+        icon = "🕵️";
+        title = "IMPOSTOR MENANG!";
+
+        sub =
+            "Kalian berdua salah vote. Impostornya berhasil lolos 😭";
+
+    }
+
+
+    const impostorName =
+        impostor === 1
+            ? (isHost ? myName : opponentName)
+            : (isHost ? opponentName : myName);
+
+
+    document.getElementById("resultIcon")
+        .textContent = icon;
+
+    document.getElementById("resultTitle")
+        .textContent = title;
+
+    document.getElementById("resultSub")
+        .textContent = sub;
+
+    document.getElementById("actualImpostor")
+        .textContent = impostorName;
+
+
+    document.getElementById("scoreName1")
+        .textContent =
+        isHost ? myName : opponentName;
+
+    document.getElementById("scoreName2")
+        .textContent =
+        isHost ? opponentName : myName;
+
+
+    document.getElementById("score1")
+        .textContent =
+        scores.player1;
+
+    document.getElementById("score2")
+        .textContent =
+        scores.player2;
+
+
+    showScreen("result");
+
+}
+
+
+/* =========================================================
+   PLAY AGAIN
+========================================================= */
+
+function playAgain() {
+
+    myClue = "";
+    opponentClue = "";
+
+    myVote = null;
+    opponentVote = null;
+
+
+    if(isHost) {
+
+        send({
+            type: "playAgain"
+        });
+
+        startGame();
+
+    } else {
+
+        send({
+            type: "playAgain"
+        });
+
+        document.getElementById("resultSub")
+            .textContent =
+            "Nunggu host mulai round berikutnya...";
+
+    }
+
+}
+
+
+/* =========================================================
+   TIMER
+========================================================= */
+
+function startTimer(seconds, element, callback) {
+
+    clearInterval(timerInterval);
+
+    let time = seconds;
+
+    element.textContent = time + "s";
+    element.classList.remove("warning");
+
+
+    timerInterval =
+        setInterval(() => {
+
+            time--;
+
+            element.textContent =
+                time + "s";
+
+
+            if(time <= 5) {
+
+                element.classList.add("warning");
+
+            }
+
+
+            if(time <= 0) {
+
+                clearInterval(timerInterval);
+
+                callback();
+
+            }
+
+        },1000);
+
+}
+
+
+/* =========================================================
+   COPY ROOM
+========================================================= */
+
+function copyRoom() {
+
+    navigator.clipboard
+        .writeText(roomCode)
+        .then(() => {
+
+            const btn =
+                document.querySelector(
+                    "#room .btn-secondary"
+                );
+
+            const old = btn.textContent;
+
+            btn.textContent =
+                "✅ COPIED!";
+
+            setTimeout(() => {
+
+                btn.textContent = old;
+
+            },1500);
+
+        });
+
+}
+
+
+/* =========================================================
+   BACK HOME
+========================================================= */
+
+function backHome() {
+
+    clearInterval(timerInterval);
+
+    if(conn) {
+
+        try {
+            conn.close();
+        } catch(e) {}
+
+    }
+
+    if(peer) {
+
+        try {
+            peer.destroy();
+        } catch(e) {}
+
+    }
+
+
+    peer = null;
+    conn = null;
+
+    roomCode = "";
+    myName = "";
+    opponentName = "";
+
+    myRole = "";
+    myWord = "";
+
+    currentRound = 1;
+
+    scores = {
+        player1: 0,
+        player2: 0
+    };
+
+
+    document.getElementById("nameInput").value = "";
+    document.getElementById("roomInput").value = "";
+
+    showScreen("home");
+
+}
+
+
+/* =========================================================
+   PREVENT ACCIDENTAL RELOAD WARNING
+========================================================= */
+
+window.addEventListener("beforeunload", e => {
+
+    if(peer) {
+
+        e.preventDefault();
+        e.returnValue = "";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>

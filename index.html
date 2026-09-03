@@ -2,759 +2,716 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WHO'S THE IMPOSTOR?</title>
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
 
 *{
     box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
     margin:0;
     padding:0;
-}
-
-:root{
-    --bg:#070914;
-    --bg2:#0d1020;
-    --card:#111528;
-    --card2:#181d35;
-    --purple:#8b5cf6;
-    --purple2:#a78bfa;
-    --pink:#ec4899;
-    --blue:#38bdf8;
-    --green:#22c55e;
-    --red:#ef4444;
-    --yellow:#facc15;
-    --text:#f8fafc;
-    --muted:#94a3b8;
-    --border:rgba(255,255,255,.09);
-}
-
-html,
-body{
     min-height:100%;
+    font-family:'Fredoka',sans-serif;
+    background:#080b19;
+    color:#fff;
 }
 
 body{
-    min-height:100vh;
-    background:
-        radial-gradient(circle at 15% 5%,rgba(139,92,246,.20),transparent 30%),
-        radial-gradient(circle at 90% 90%,rgba(236,72,153,.14),transparent 30%),
-        linear-gradient(145deg,var(--bg),var(--bg2));
-    color:var(--text);
-    font-family:'Fredoka',sans-serif;
     overflow-x:hidden;
 }
 
 button,
-input,
-textarea{
+input{
     font-family:inherit;
 }
 
 button{
+    border:0;
     cursor:pointer;
-    border:none;
 }
 
 .hidden{
     display:none!important;
 }
 
-.app{
-    width:100%;
-    min-height:100vh;
-    padding:18px;
-    display:flex;
-    justify-content:center;
+/* =========================
+   BACKGROUND
+========================= */
+
+body::before{
+    content:"";
+    position:fixed;
+    width:320px;
+    height:320px;
+    background:#5d2de8;
+    filter:blur(130px);
+    opacity:.17;
+    top:-120px;
+    left:-100px;
+    pointer-events:none;
 }
 
-.screen{
+body::after{
+    content:"";
+    position:fixed;
+    width:300px;
+    height:300px;
+    background:#00d9ff;
+    filter:blur(150px);
+    opacity:.10;
+    bottom:-130px;
+    right:-100px;
+    pointer-events:none;
+}
+
+.app{
     width:100%;
-    max-width:650px;
+    max-width:720px;
+    margin:auto;
+    min-height:100vh;
+    padding:18px;
+    position:relative;
+    z-index:1;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.logo{
+    text-align:center;
+    padding:12px 0 20px;
+}
+
+.logo h1{
+    margin:0;
+    font-size:clamp(28px,8vw,48px);
+    font-weight:700;
+    letter-spacing:-1px;
+}
+
+.logo p{
+    margin:5px 0 0;
+    color:#8f96b4;
+    font-size:14px;
+}
+
+/* =========================
+   SCREEN
+========================= */
+
+.screen{
     animation:screenIn .35s ease;
 }
 
 @keyframes screenIn{
     from{
         opacity:0;
-        transform:translateY(14px) scale(.98);
+        transform:translateY(12px);
     }
     to{
         opacity:1;
-        transform:none;
+        transform:translateY(0);
     }
 }
-
-/* ================================
-   LOGO
-================================ */
-
-.logo{
-    text-align:center;
-    padding:12px 0 22px;
-}
-
-.logoEmoji{
-    font-size:55px;
-    display:inline-block;
-    animation:float 2.8s ease-in-out infinite;
-}
-
-@keyframes float{
-    50%{
-        transform:translateY(-7px) rotate(4deg);
-    }
-}
-
-.logo h1{
-    font-family:'Baloo 2',sans-serif;
-    font-size:clamp(40px,10vw,62px);
-    font-weight:800;
-    line-height:.85;
-    letter-spacing:-2px;
-    background:linear-gradient(135deg,#fff,#c4b5fd,#f9a8d4);
-    -webkit-background-clip:text;
-    color:transparent;
-}
-
-.logo p{
-    color:var(--muted);
-    margin-top:11px;
-    font-size:14px;
-}
-
-/* ================================
-   CARD
-================================ */
 
 .card{
-    background:linear-gradient(
-        145deg,
-        rgba(20,25,48,.97),
-        rgba(10,13,28,.97)
-    );
-    border:1px solid var(--border);
+    background:rgba(14,18,38,.92);
+    border:1px solid rgba(255,255,255,.07);
     border-radius:28px;
     padding:22px;
-    box-shadow:
-        0 30px 80px rgba(0,0,0,.38),
-        inset 0 1px rgba(255,255,255,.03);
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
 }
 
-.sectionTitle{
-    font-size:22px;
-    font-weight:700;
-    margin-bottom:14px;
+.title{
+    font-size:27px;
+    margin:0 0 8px;
 }
 
-.field{
-    margin-bottom:14px;
+.subtitle{
+    color:#8e95b3;
+    margin:0 0 22px;
+    line-height:1.5;
 }
 
-.field label{
-    display:block;
-    font-size:13px;
-    color:#cbd5e1;
-    margin-bottom:7px;
-}
+/* =========================
+   INPUT
+========================= */
 
-input,
-textarea{
+.input{
     width:100%;
-    background:#070a16;
-    color:white;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:15px;
-    padding:14px 15px;
+    padding:17px 18px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.08);
+    background:#080b18;
+    color:#fff;
     outline:none;
-    font-size:16px;
-    transition:.2s;
+    font-size:17px;
+    margin-bottom:12px;
 }
 
-input:focus,
-textarea:focus{
-    border-color:var(--purple);
-    box-shadow:0 0 0 3px rgba(139,92,246,.12);
+.input:focus{
+    border-color:#7440f3;
+    box-shadow:0 0 0 3px rgba(116,64,243,.12);
 }
 
-textarea{
-    min-height:105px;
-    resize:none;
-}
+/* =========================
+   BUTTONS
+========================= */
 
 .btn{
     width:100%;
-    padding:15px 18px;
-    border-radius:16px;
-    color:white;
-    font-size:16px;
+    padding:17px 18px;
+    border-radius:18px;
+    font-size:17px;
     font-weight:700;
-    transition:.18s;
+    color:#fff;
+    margin-top:10px;
+    transition:.18s ease;
 }
 
 .btn:active{
     transform:scale(.97);
 }
 
-.btn.primary{
-    background:linear-gradient(135deg,#7c3aed,#a855f7);
-    box-shadow:0 10px 25px rgba(124,58,237,.25);
+.btn-primary{
+    background:linear-gradient(135deg,#6f36e8,#963cff);
 }
 
-.btn.secondary{
-    background:#252b49;
+.btn-green{
+    background:linear-gradient(135deg,#14bb60,#20d66c);
 }
 
-.btn.green{
-    background:linear-gradient(135deg,#16a34a,#22c55e);
+.btn-blue{
+    background:linear-gradient(135deg,#159de4,#34b8f0);
 }
 
-.btn.red{
-    background:linear-gradient(135deg,#dc2626,#ef4444);
+.btn-gray{
+    background:#272d4c;
 }
 
-.btn.telegram{
-    background:linear-gradient(135deg,#229ed9,#38bdf8);
+.btn-red{
+    background:linear-gradient(135deg,#dc3d58,#ef526d);
 }
 
-.btn:disabled{
-    opacity:.45;
-    cursor:not-allowed;
-    transform:none;
-}
+/* =========================
+   HOME
+========================= */
 
-.divider{
-    display:flex;
-    align-items:center;
+.home-buttons{
+    display:grid;
     gap:12px;
-    margin:18px 0;
-    color:#64748b;
-    font-size:12px;
 }
 
-.divider:before,
-.divider:after{
-    content:"";
-    height:1px;
-    flex:1;
-    background:var(--border);
-}
-
-/* ================================
-   LOBBY
-================================ */
-
-.roomBox{
+.big-icon{
+    font-size:65px;
     text-align:center;
-    background:#070a16;
-    border:1px solid var(--border);
-    border-radius:21px;
-    padding:18px;
-    margin-bottom:15px;
+    margin:4px 0 15px;
 }
 
-.roomLabel{
-    color:var(--muted);
-    font-size:11px;
-    letter-spacing:1px;
-}
-
-.roomCode{
-    color:#c4b5fd;
-    font-size:42px;
-    font-weight:800;
-    letter-spacing:8px;
-    margin:2px 0 5px;
-    user-select:all;
-}
-
-.roomHint{
-    color:#64748b;
-    font-size:11px;
-}
-
-.status{
-    min-height:25px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    color:#cbd5e1;
-    font-size:13px;
-    margin:12px 0;
-}
-
-.dot{
-    width:9px;
-    height:9px;
-    border-radius:50%;
-    background:#64748b;
-}
-
-.dot.loading{
-    background:var(--yellow);
-    animation:pulse 1s infinite;
-}
-
-.dot.ok{
-    background:var(--green);
-    box-shadow:0 0 12px rgba(34,197,94,.7);
-}
-
-.dot.error{
-    background:var(--red);
-}
-
-@keyframes pulse{
-    50%{opacity:.3}
-}
-
-.playersGrid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:9px;
-    margin:17px 0;
-}
-
-.playerCard{
-    position:relative;
-    background:#090d1d;
-    border:1px solid var(--border);
-    border-radius:17px;
-    padding:13px 10px;
-    text-align:center;
-    min-width:0;
-}
-
-.playerAvatar{
-    font-size:27px;
-    margin-bottom:3px;
-}
-
-.playerName{
-    font-size:14px;
-    font-weight:700;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-.playerStatus{
-    color:#64748b;
-    font-size:10px;
-    margin-top:3px;
-}
-
-.hostTag{
-    position:absolute;
-    top:7px;
-    right:7px;
-    font-size:8px;
-    color:#c4b5fd;
-    background:rgba(139,92,246,.12);
-    padding:3px 5px;
-    border-radius:6px;
-}
-
-.notice{
-    background:rgba(139,92,246,.09);
-    border:1px solid rgba(139,92,246,.18);
-    border-radius:15px;
-    padding:13px 14px;
-    color:#cbd5e1;
-    font-size:12px;
-    line-height:1.5;
-    margin-bottom:13px;
-}
-
-.errorBox{
-    background:rgba(239,68,68,.09);
-    border:1px solid rgba(239,68,68,.25);
-    border-radius:15px;
-    padding:12px 14px;
-    color:#fca5a5;
-    font-size:12px;
-    line-height:1.5;
-    margin-bottom:13px;
-}
-
-.lobbyActions{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:9px;
-    margin-top:10px;
-}
-
-/* ================================
-   CHAT
-================================ */
-
-.chatBox{
+.rules{
     margin-top:18px;
-    border:1px solid var(--border);
-    border-radius:21px;
-    overflow:hidden;
-    background:#080b17;
+    padding:17px;
+    background:#171b35;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:20px;
+    color:#aeb4cc;
+    line-height:1.65;
+    font-size:14px;
 }
 
-.chatHeader{
-    padding:12px 14px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    background:#11162b;
-    border-bottom:1px solid var(--border);
-}
+/* =========================
+   ROOM
+========================= */
 
-.chatTitle{
-    font-weight:700;
-}
-
-.chatCount{
-    color:#64748b;
-    font-size:11px;
-}
-
-.chatMessages{
-    height:190px;
-    overflow-y:auto;
-    padding:12px;
-}
-
-.chatEmpty{
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#475569;
-    font-size:12px;
+.room-code{
+    background:#080b19;
+    border:1px dashed rgba(255,255,255,.18);
+    border-radius:22px;
+    padding:16px;
     text-align:center;
-}
-
-.chatMsg{
-    margin-bottom:9px;
-    max-width:90%;
-}
-
-.chatMsg.me{
-    margin-left:auto;
-    text-align:right;
-}
-
-.chatBubble{
-    display:inline-block;
-    background:#191f39;
-    border-radius:14px;
-    padding:8px 10px;
-    font-size:13px;
-    text-align:left;
-    word-break:break-word;
-}
-
-.chatMsg.me .chatBubble{
-    background:#6d3fd3;
-}
-
-.chatAuthor{
-    color:#64748b;
-    font-size:9px;
-    margin:2px 5px;
-}
-
-.chatInputRow{
-    display:flex;
-    gap:7px;
-    padding:9px;
-    border-top:1px solid var(--border);
-}
-
-.chatInputRow input{
-    padding:11px 12px;
-    min-width:0;
-}
-
-.chatSend{
-    width:48px;
-    border-radius:13px;
-    background:#7c3aed;
-    color:white;
-    font-size:19px;
-}
-
-/* ================================
-   GAME TOP
-================================ */
-
-.gameTop{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:9px;
-}
-
-.badge{
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-    background:#252b49;
-    color:#c4b5fd;
-    padding:7px 10px;
-    border-radius:999px;
-    font-size:11px;
-    font-weight:700;
-}
-
-.timer{
-    font-size:25px;
-    font-weight:800;
-}
-
-.progress{
-    height:7px;
-    border-radius:999px;
-    background:#252b49;
-    overflow:hidden;
     margin-bottom:18px;
 }
 
-.progressBar{
-    height:100%;
-    width:100%;
-    background:linear-gradient(90deg,#8b5cf6,#ec4899);
-    transition:width 1s linear;
+.room-code small{
+    display:block;
+    color:#767e9e;
+    font-size:13px;
+    margin-bottom:5px;
 }
 
-/* ================================
-   SECRET
-================================ */
-
-.secretBox{
-    background:#080b17;
-    border:1px dashed rgba(167,139,250,.4);
-    border-radius:21px;
-    padding:23px 15px;
-    text-align:center;
-    margin-bottom:17px;
-}
-
-.secretLabel{
-    color:#64748b;
-    font-size:11px;
-    margin-bottom:6px;
-    letter-spacing:1px;
-}
-
-.secretWord{
-    color:#c4b5fd;
-    font-size:36px;
-    font-weight:800;
-}
-
-.clueTitle{
-    text-align:center;
-    font-size:23px;
+.code{
+    font-size:34px;
+    letter-spacing:7px;
     font-weight:700;
-    margin:12px 0 16px;
+    color:#fff;
+    user-select:none;
 }
 
-.clueStatus{
-    text-align:center;
-    color:#64748b;
+.copy-hint{
+    margin-top:5px;
+    color:#8e95b3;
     font-size:12px;
-    margin-top:9px;
 }
 
-/* ================================
-   CLUE LIST
-================================ */
-
-.clueList{
-    display:flex;
-    flex-direction:column;
-    gap:9px;
-    margin-top:16px;
-}
-
-.clueItem{
-    background:#090d1d;
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:12px 13px;
-}
-
-.clueAuthor{
-    color:#a78bfa;
-    font-size:11px;
-    margin-bottom:4px;
-}
-
-.clueText{
-    font-size:15px;
-    line-height:1.35;
-}
-
-.clueWaiting{
-    color:#475569;
-    font-style:italic;
-}
-
-/* ================================
-   VOTE
-================================ */
-
-.voteGrid{
-    display:flex;
-    flex-direction:column;
-    gap:9px;
-}
-
-.voteBtn{
-    width:100%;
-    background:#090d1d;
-    color:white;
-    border:1px solid var(--border);
-    border-radius:17px;
-    padding:15px;
+.status{
     display:flex;
     align-items:center;
+    gap:9px;
+    color:#c5c9da;
+    margin:15px 0;
+}
+
+.dot{
+    width:12px;
+    height:12px;
+    background:#24d66a;
+    border-radius:50%;
+    box-shadow:0 0 15px #24d66a;
+}
+
+.players-title{
+    font-size:25px;
+    margin:20px 0 13px;
+}
+
+.players-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
     gap:12px;
-    text-align:left;
-    transition:.18s;
 }
 
-.voteBtn:hover{
-    border-color:var(--purple);
-    background:#151a31;
-}
-
-.voteAvatar{
-    font-size:27px;
-}
-
-.voteName{
-    font-weight:700;
-    font-size:15px;
-}
-
-.voteSub{
-    color:#64748b;
-    font-size:10px;
-    margin-top:2px;
-}
-
-/* ================================
-   RESULT
-================================ */
-
-.result{
+.player{
+    position:relative;
+    background:#090c1b;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:23px;
+    padding:20px 10px;
     text-align:center;
+    min-height:155px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
 }
 
-.resultIcon{
-    font-size:65px;
-    margin-bottom:4px;
-}
-
-.result h2{
-    font-size:30px;
+.player-avatar{
+    font-size:40px;
     margin-bottom:8px;
 }
 
-.resultText{
-    color:#cbd5e1;
-    font-size:14px;
+.player-name{
+    font-size:17px;
+    font-weight:700;
+}
+
+.player-online{
+    color:#737b99;
+    font-size:13px;
+    margin-top:7px;
+}
+
+.host-badge{
+    position:absolute;
+    right:10px;
+    top:10px;
+    background:#201742;
+    color:#a981ff;
+    border-radius:9px;
+    padding:5px 8px;
+    font-size:11px;
+}
+
+.info{
+    background:#1b193b;
+    border:1px solid rgba(137,100,255,.13);
+    color:#bfc3d6;
+    border-radius:22px;
+    padding:18px;
+    margin:18px 0;
     line-height:1.6;
 }
 
-.scoreList{
+/* =========================
+   TELEGRAM
+========================= */
+
+.telegram{
+    background:linear-gradient(135deg,#159ddf,#38b9ef);
+    box-shadow:0 10px 25px rgba(25,160,230,.16);
+}
+
+/* =========================
+   GAME
+========================= */
+
+.round{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.round-label{
+    color:#9299b7;
+    font-size:14px;
+}
+
+.timer{
+    background:#241d45;
+    color:#c19aff;
+    border-radius:13px;
+    padding:8px 12px;
+    font-weight:700;
+}
+
+.timer.warning{
+    background:#47251e;
+    color:#ffb15f;
+}
+
+.word-card{
+    background:linear-gradient(145deg,#171437,#21194d);
+    border-radius:26px;
+    padding:25px;
+    text-align:center;
+    margin:18px 0;
+    border:1px solid rgba(155,118,255,.13);
+}
+
+.word-label{
+    color:#949bb8;
+    font-size:13px;
+}
+
+.word{
+    font-size:35px;
+    font-weight:700;
+    margin-top:7px;
+}
+
+.clue-input{
+    width:100%;
+    min-height:115px;
+    resize:none;
+    border-radius:20px;
+    background:#080b19;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.08);
+    padding:16px;
+    font-family:inherit;
+    font-size:17px;
+    outline:none;
+}
+
+.clue-input:focus{
+    border-color:#7741f4;
+}
+
+.clue-list{
+    display:grid;
+    gap:10px;
+    margin-top:15px;
+}
+
+.clue-item{
+    background:#10142a;
+    border-radius:17px;
+    padding:13px 15px;
+}
+
+.clue-name{
+    color:#9184d7;
+    font-size:13px;
+    margin-bottom:4px;
+}
+
+.clue-text{
+    font-size:16px;
+}
+
+/* =========================
+   VOTING
+========================= */
+
+.vote-grid{
+    display:grid;
+    gap:11px;
+    margin-top:18px;
+}
+
+.vote{
+    width:100%;
+    text-align:left;
+    background:#10142a;
+    border:1px solid rgba(255,255,255,.07);
+    color:#fff;
+    padding:16px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    transition:.15s;
+}
+
+.vote:active{
+    transform:scale(.98);
+}
+
+.vote.selected{
+    background:#33205e;
+    border-color:#914eff;
+}
+
+.vote-avatar{
+    font-size:29px;
+}
+
+.vote-name{
+    font-weight:700;
+}
+
+/* =========================
+   RESULT
+========================= */
+
+.result-icon{
+    font-size:70px;
+    text-align:center;
+    margin:8px 0;
+}
+
+.result-title{
+    text-align:center;
+    font-size:30px;
+    margin:0;
+}
+
+.result-sub{
+    text-align:center;
+    color:#979db8;
+    margin:7px 0 22px;
+}
+
+.score-list{
+    display:grid;
+    gap:9px;
+}
+
+.score{
+    background:#10142a;
+    border-radius:16px;
+    padding:14px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.score-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.score-avatar{
+    font-size:25px;
+}
+
+.score-points{
+    color:#b987ff;
+    font-weight:700;
+}
+
+/* =========================
+   GLOBAL CHAT
+========================= */
+
+.chat-wrap{
+    margin-top:18px;
+    background:#0a0d1d;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:25px;
+    overflow:hidden;
+}
+
+.chat-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:17px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.chat-head strong{
+    font-size:18px;
+}
+
+.chat-count{
+    color:#717993;
+    font-size:13px;
+}
+
+.chat-messages{
+    height:300px;
+    overflow-y:auto;
+    padding:13px;
     display:flex;
     flex-direction:column;
-    gap:7px;
-    margin:19px 0;
-    text-align:left;
-}
-
-.scoreRow{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:11px 13px;
-    background:#090d1d;
-    border-radius:13px;
-}
-
-.scorePlayer{
-    display:flex;
-    align-items:center;
     gap:8px;
-    min-width:0;
 }
 
-.scorePlayer span:last-child{
+.chat-message{
+    display:flex;
+    flex-direction:column;
+    max-width:82%;
+    align-self:flex-start;
+}
+
+.chat-message.mine{
+    align-self:flex-end;
+    align-items:flex-end;
+}
+
+.chat-sender{
+    color:#777f9d;
+    font-size:11px;
+    margin:0 8px 3px;
+}
+
+.chat-bubble{
+    background:#171b31;
+    border-radius:15px;
+    padding:9px 12px;
+    line-height:1.35;
+    word-break:break-word;
+}
+
+.mine .chat-bubble{
+    background:linear-gradient(135deg,#7035df,#8b3df0);
+}
+
+.system{
+    align-self:center;
+    max-width:95%;
+    color:#737b99;
+    font-size:12px;
+    text-align:center;
+    padding:3px 7px;
+}
+
+.chat-form{
+    border-top:1px solid rgba(255,255,255,.06);
+    padding:10px;
+    display:flex;
+    gap:9px;
+}
+
+.chat-input{
+    min-width:0;
+    flex:1;
+    background:#080b19;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:18px;
+    padding:13px 15px;
+    color:#fff;
+    outline:none;
+    font-size:16px;
+}
+
+.chat-send{
+    width:55px;
+    height:55px;
+    border-radius:17px;
+    background:#7b39ed;
+    color:#fff;
+    font-size:25px;
+    flex-shrink:0;
+}
+
+/* =========================
+   FLOATING CHAT
+========================= */
+
+.game-chat{
+    position:fixed;
+    right:15px;
+    bottom:15px;
+    z-index:50;
+}
+
+.chat-toggle{
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#7337e9,#a342ff);
+    color:#fff;
+    font-size:25px;
+    box-shadow:0 10px 30px rgba(115,55,233,.4);
+}
+
+.chat-panel{
+    position:absolute;
+    right:0;
+    bottom:68px;
+    width:min(360px,calc(100vw - 30px));
+    background:#0c1021;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:22px;
     overflow:hidden;
-    text-overflow:ellipsis;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+.chat-panel .chat-messages{
+    height:300px;
+}
+
+.chat-panel-title{
+    padding:15px;
+    font-weight:700;
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:25px;
+    transform:translateX(-50%) translateY(20px);
+    background:#fff;
+    color:#111;
+    padding:11px 16px;
+    border-radius:13px;
+    font-weight:600;
+    font-size:14px;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+    z-index:100;
     white-space:nowrap;
 }
 
-.scoreValue{
-    color:#c4b5fd;
-    font-size:19px;
-    font-weight:800;
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
 }
 
-/* ================================
-   FINAL
-================================ */
+/* =========================
+   RESPONSIVE
+========================= */
 
-.finalIcon{
-    font-size:80px;
-}
-
-.winnerName{
-    font-size:35px;
-    color:#c4b5fd;
-    font-weight:800;
-    margin:7px 0;
-}
-
-/* ================================
-   SMALL HELPERS
-================================ */
-
-.loadingArea{
-    text-align:center;
-    padding:25px 0;
-}
-
-.spinner{
-    width:38px;
-    height:38px;
-    margin:0 auto 13px;
-    border:4px solid #252b49;
-    border-top-color:#a78bfa;
-    border-radius:50%;
-    animation:spin .8s linear infinite;
-}
-
-@keyframes spin{
-    to{transform:rotate(360deg)}
-}
-
-.footer{
-    color:#475569;
-    text-align:center;
-    font-size:10px;
-    margin-top:14px;
-}
-
-@media(max-width:420px){
+@media(max-width:500px){
     .app{
-        padding:12px;
+        padding:14px;
     }
 
     .card{
@@ -762,17 +719,16 @@ textarea{
         border-radius:23px;
     }
 
-    .logo h1{
-        font-size:39px;
+    .players-grid{
+        gap:9px;
     }
 
-    .roomCode{
-        font-size:34px;
-        letter-spacing:6px;
+    .player{
+        min-height:140px;
     }
 
-    .playersGrid{
-        grid-template-columns:repeat(2,1fr);
+    .word{
+        font-size:29px;
     }
 }
 </style>
@@ -782,837 +738,613 @@ textarea{
 
 <div class="app">
 
-<!-- =====================================================
-     HOME
-===================================================== -->
-
-<section id="home" class="screen">
-
     <div class="logo">
-        <div class="logoEmoji">🕵️</div>
-
-        <h1>WHO'S THE<br>IMPOSTOR?</h1>
-
-        <p>
-            2–10 players · 5 rounds · 1 sneaky impostor
-        </p>
+        <h1>WHO'S THE IMPOSTOR?</h1>
+        <p>trust nobody. seriously.</p>
     </div>
 
-    <div class="card">
+    <!-- =========================
+         HOME
+    ========================== -->
 
-        <div class="field">
-            <label>Nama lo</label>
+    <section id="homeScreen" class="screen">
 
-            <input
-                id="homeName"
-                maxlength="18"
-                placeholder="contoh: Raka"
-                autocomplete="off"
-            >
-        </div>
+        <div class="card">
 
-        <button class="btn primary" onclick="createRoom()">
-            CREATE ROOM
-        </button>
+            <div class="big-icon">🕵️</div>
 
-        <div class="divider">
-            ATAU JOIN ROOM
-        </div>
+            <h2 class="title">Main bareng temen lu</h2>
 
-        <div class="field">
-            <label>Room code</label>
+            <p class="subtitle">
+                Cari siapa impostornya sebelum dia berhasil nipu semua orang.
+            </p>
 
-            <input
-                id="joinCode"
-                maxlength="5"
-                placeholder="ABCDE"
-                autocomplete="off"
-                style="text-align:center;text-transform:uppercase;letter-spacing:6px"
-            >
-        </div>
+            <div class="home-buttons">
 
-        <button class="btn secondary" onclick="joinRoom()">
-            JOIN ROOM
-        </button>
+                <button class="btn btn-primary" onclick="showCreate()">
+                    CREATE ROOM
+                </button>
 
-        <div id="homeError" class="errorBox hidden"></div>
-
-        <div class="footer">
-            Open this same page on your friends' phones.
-        </div>
-
-    </div>
-</section>
-
-
-<!-- =====================================================
-     LOBBY
-===================================================== -->
-
-<section id="lobby" class="screen hidden">
-
-    <div class="logo">
-        <div class="logoEmoji">🎭</div>
-
-        <h1 style="font-size:44px">
-            LOBBY
-        </h1>
-
-        <p>
-            Get everyone inside before starting.
-        </p>
-    </div>
-
-    <div class="card">
-
-        <div class="roomBox">
-
-            <div class="roomLabel">
-                ROOM CODE
-            </div>
-
-            <div id="roomCodeDisplay" class="roomCode">
-                -----
-            </div>
-
-            <div class="roomHint">
-                Share this code with your friends
-            </div>
-
-        </div>
-
-        <button
-            class="btn telegram"
-            onclick="shareTelegram()"
-        >
-            ✈️ SHARE ROOM TO TELEGRAM
-        </button>
-
-        <div id="connectionStatus" class="status">
-            <span class="dot loading"></span>
-            <span>Preparing connection...</span>
-        </div>
-
-        <div id="lobbyError" class="errorBox hidden"></div>
-
-        <div class="sectionTitle">
-            Players <span id="playerCount">(1/10)</span>
-        </div>
-
-        <div id="playersGrid" class="playersGrid"></div>
-
-        <div id="hostControls">
-
-            <div class="notice">
-                Minimal <b>2 players</b>, maksimal <b>10 players</b>.
-                Semua pemain bisa ngobrol di chat sebelum game dimulai.
-            </div>
-
-            <button
-                id="startBtn"
-                class="btn green"
-                onclick="hostStartMatch()"
-                disabled
-            >
-                WAITING FOR PLAYERS...
-            </button>
-
-        </div>
-
-        <div id="guestControls" class="hidden">
-
-            <div class="loadingArea">
-                <div class="spinner"></div>
-
-                <p id="guestWaitingText">
-                    Connecting to host...
-                </p>
-            </div>
-
-            <button
-                id="retryBtn"
-                class="btn secondary hidden"
-                onclick="retryJoin()"
-            >
-                TRY AGAIN
-            </button>
-
-        </div>
-
-        <!-- CHAT -->
-        <div id="lobbyChat" class="chatBox">
-
-            <div class="chatHeader">
-                <div class="chatTitle">
-                    💬 Room Chat
-                </div>
-
-                <div id="chatCount" class="chatCount">
-                    0 messages
-                </div>
-            </div>
-
-            <div id="chatMessages" class="chatMessages">
-
-                <div id="chatEmpty" class="chatEmpty">
-                    Belum ada chat.<br>
-                    Say hi dulu 👋
-                </div>
-
-            </div>
-
-            <div class="chatInputRow">
-
-                <input
-                    id="chatInput"
-                    maxlength="120"
-                    placeholder="Ketik sesuatu..."
-                    autocomplete="off"
-                >
-
-                <button
-                    class="chatSend"
-                    onclick="sendChat()"
-                >
-                    ➤
+                <button class="btn btn-blue" onclick="showJoin()">
+                    JOIN ROOM
                 </button>
 
             </div>
 
-        </div>
-
-        <button
-            class="btn secondary"
-            style="margin-top:12px"
-            onclick="leaveRoom()"
-        >
-            LEAVE ROOM
-        </button>
-
-    </div>
-</section>
-
-
-<!-- =====================================================
-     CLUE SCREEN
-===================================================== -->
-
-<section id="clueScreen" class="screen hidden">
-
-    <div class="logo">
-        <div class="logoEmoji">🤫</div>
-
-        <h1 style="font-size:43px">
-            CLUE TIME
-        </h1>
-
-        <p>
-            Kasih clue. Jangan terlalu obvious.
-        </p>
-    </div>
-
-    <div class="card">
-
-        <div class="gameTop">
-
-            <span class="badge">
-                ROUND <span id="roundNumber">1</span>/5
-            </span>
-
-            <span id="clueTimer" class="timer">
-                60
-            </span>
-
-        </div>
-
-        <div class="progress">
-            <div
-                id="clueProgress"
-                class="progressBar"
-            ></div>
-        </div>
-
-        <div class="secretBox">
-
-            <div class="secretLabel">
-                YOUR SECRET WORD
+            <div class="rules">
+                <b>How to play?</b><br>
+                1. Buat room dan share code ke temen.<br>
+                2. Semua orang dapat kata rahasia.<br>
+                3. Impostor dapat kata yang berbeda.<br>
+                4. Kasih clue tanpa terlalu obvious.<br>
+                5. Voting siapa yang paling mencurigakan.<br>
+                6. Main sampai <b>5 ronde</b>.
             </div>
 
-            <div
-                id="secretWord"
-                class="secretWord"
+        </div>
+
+    </section>
+
+    <!-- =========================
+         CREATE
+    ========================== -->
+
+    <section id="createScreen" class="screen hidden">
+
+        <div class="card">
+
+            <h2 class="title">Create Room</h2>
+
+            <p class="subtitle">
+                Masukin nama lu dulu.
+            </p>
+
+            <input
+                id="hostName"
+                class="input"
+                maxlength="18"
+                placeholder="Nama lu..."
             >
-                ???
+
+            <button class="btn btn-primary" onclick="createRoom()">
+                CREATE ROOM
+            </button>
+
+            <button class="btn btn-gray" onclick="showHome()">
+                BACK
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         JOIN
+    ========================== -->
+
+    <section id="joinScreen" class="screen hidden">
+
+        <div class="card">
+
+            <h2 class="title">Join Room</h2>
+
+            <p class="subtitle">
+                Masukin nama + kode room dari temen lu.
+            </p>
+
+            <input
+                id="guestName"
+                class="input"
+                maxlength="18"
+                placeholder="Nama lu..."
+            >
+
+            <input
+                id="joinCode"
+                class="input"
+                maxlength="5"
+                autocomplete="off"
+                placeholder="ABCDE"
+                style="text-transform:uppercase;text-align:center;letter-spacing:5px;"
+            >
+
+            <button class="btn btn-blue" onclick="joinRoom()">
+                JOIN ROOM
+            </button>
+
+            <button class="btn btn-gray" onclick="showHome()">
+                BACK
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         LOBBY
+    ========================== -->
+
+    <section id="lobbyScreen" class="screen hidden">
+
+        <div class="card">
+
+            <div class="room-code" onclick="copyRoomCode()">
+                <small>ROOM CODE · TAP TO COPY</small>
+                <div id="roomCodeText" class="code">-----</div>
+                <div class="copy-hint">
+                    tap/klik kode ini buat copy
+                </div>
+            </div>
+
+            <button class="btn telegram" onclick="shareTelegram()">
+                ✈️ SHARE ROOM TO TELEGRAM
+            </button>
+
+            <div class="status">
+                <span class="dot"></span>
+                <span id="roomStatus">Room ready · waiting for players</span>
+            </div>
+
+            <h2 class="players-title">
+                Players (<span id="playerCount">0</span>/10)
+            </h2>
+
+            <div id="playersGrid" class="players-grid"></div>
+
+            <div class="info">
+                Minimal <b>2 players</b>, maksimal <b>10 players</b>.<br>
+                Semua pemain bisa ngobrol di chat.
+                Match terdiri dari <b>5 ronde</b>.
+            </div>
+
+            <button
+                id="startButton"
+                class="btn btn-green hidden"
+                onclick="hostStartMatch()"
+            >
+                START MATCH
+            </button>
+
+            <div id="waitingText" style="
+                text-align:center;
+                color:#747c99;
+                margin-top:15px;
+            ">
+                Waiting for host...
+            </div>
+
+            <!-- LOBBY CHAT -->
+
+            <div class="chat-wrap">
+
+                <div class="chat-head">
+                    <strong>💬 Room Chat</strong>
+                    <span id="chatCount" class="chat-count">
+                        0 messages
+                    </span>
+                </div>
+
+                <div id="lobbyChatMessages" class="chat-messages"></div>
+
+                <div class="chat-form">
+                    <input
+                        id="lobbyChatInput"
+                        class="chat-input"
+                        maxlength="180"
+                        placeholder="Ketik sesuatu..."
+                    >
+
+                    <button
+                        class="chat-send"
+                        onclick="sendChatFrom('lobbyChatInput')"
+                    >
+                        ➤
+                    </button>
+                </div>
+
+            </div>
+
+            <button class="btn btn-gray" onclick="leaveRoom()">
+                LEAVE ROOM
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         CLUE
+    ========================== -->
+
+    <section id="clueScreen" class="screen hidden">
+
+        <div class="card">
+
+            <div class="round">
+                <span class="round-label">
+                    ROUND <b id="clueRound">1</b> / 5
+                </span>
+
+                <span id="clueTimer" class="timer">
+                    60s
+                </span>
+            </div>
+
+            <h2 class="title">Kasih clue lu.</h2>
+
+            <p class="subtitle">
+                Jangan terlalu obvious, nanti impostor gampang nebak.
+            </p>
+
+            <div class="word-card">
+
+                <div class="word-label">
+                    KATA LU
+                </div>
+
+                <div id="myWord" class="word">
+                    -----
+                </div>
+
+            </div>
+
+            <textarea
+                id="clueInput"
+                class="clue-input"
+                maxlength="80"
+                placeholder="Tulis clue lu..."
+            ></textarea>
+
+            <button
+                id="sendClueButton"
+                class="btn btn-primary"
+                onclick="submitClue()"
+            >
+                SEND CLUE
+            </button>
+
+            <div id="clueList" class="clue-list"></div>
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         VOTE
+    ========================== -->
+
+    <section id="voteScreen" class="screen hidden">
+
+        <div class="card">
+
+            <div class="round">
+                <span class="round-label">
+                    ROUND <b id="voteRound">1</b> / 5
+                </span>
+
+                <span id="voteTimer" class="timer">
+                    45s
+                </span>
+            </div>
+
+            <h2 class="title">Siapa impostornya?</h2>
+
+            <p class="subtitle">
+                Pilih satu orang yang paling mencurigakan.
+            </p>
+
+            <div id="voteChoices" class="vote-grid"></div>
+
+            <button
+                id="voteButton"
+                class="btn btn-primary hidden"
+                onclick="submitVote()"
+            >
+                CONFIRM VOTE
+            </button>
+
+            <div id="voteStatus" style="
+                text-align:center;
+                color:#7e86a3;
+                margin-top:15px;
+            "></div>
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         RESULT
+    ========================== -->
+
+    <section id="resultScreen" class="screen hidden">
+
+        <div class="card">
+
+            <div id="resultIcon" class="result-icon">
+                🕵️
+            </div>
+
+            <h2 id="resultTitle" class="result-title">
+                Result
+            </h2>
+
+            <p id="resultSub" class="result-sub"></p>
+
+            <div id="resultScores" class="score-list"></div>
+
+            <button
+                id="nextRoundButton"
+                class="btn btn-primary hidden"
+                onclick="hostNextRound()"
+            >
+                NEXT ROUND
+            </button>
+
+            <button
+                id="finishButton"
+                class="btn btn-green hidden"
+                onclick="showFinal()"
+            >
+                SEE FINAL SCORE
+            </button>
+
+            <div id="resultWaiting" style="
+                text-align:center;
+                color:#737b99;
+                margin-top:15px;
+            ">
+                Waiting for host...
             </div>
 
         </div>
 
-        <div class="clueTitle">
-            Your clue 👇
-        </div>
+    </section>
 
-        <textarea
-            id="clueInput"
-            maxlength="100"
-            placeholder="Tulis clue lo di sini..."
-        ></textarea>
+    <!-- =========================
+         FINAL
+    ========================== -->
 
-        <button
-            id="sendClueBtn"
-            class="btn primary"
-            style="margin-top:11px"
-            onclick="submitClue()"
-        >
-            SEND CLUE
-        </button>
+    <section id="finalScreen" class="screen hidden">
 
-        <div
-            id="clueStatus"
-            class="clueStatus"
-        >
-            0/0 players have submitted
-        </div>
+        <div class="card">
 
-        <div
-            id="clueList"
-            class="clueList"
-        ></div>
+            <div class="result-icon">🏆</div>
 
-    </div>
-</section>
+            <h2 class="result-title">
+                MATCH FINISHED
+            </h2>
 
+            <p class="result-sub">
+                5 ronde selesai. Ini hasil akhirnya.
+            </p>
 
-<!-- =====================================================
-     VOTE SCREEN
-===================================================== -->
+            <div id="finalScores" class="score-list"></div>
 
-<section id="voteScreen" class="screen hidden">
+            <button
+                id="playAgainButton"
+                class="btn btn-primary hidden"
+                onclick="hostRestartMatch()"
+            >
+                PLAY AGAIN
+            </button>
 
-    <div class="logo">
-        <div class="logoEmoji">🔎</div>
-
-        <h1 style="font-size:47px">
-            VOTE!
-        </h1>
-
-        <p>
-            Siapa yang paling mencurigakan?
-        </p>
-    </div>
-
-    <div class="card">
-
-        <div class="gameTop">
-
-            <span class="badge">
-                VOTING
-            </span>
-
-            <span id="voteTimer" class="timer">
-                45
-            </span>
+            <button
+                class="btn btn-gray"
+                onclick="leaveRoom()"
+            >
+                LEAVE ROOM
+            </button>
 
         </div>
 
-        <div class="progress">
-            <div
-                id="voteProgress"
-                class="progressBar"
-            ></div>
+    </section>
+
+</div>
+
+<!-- =========================
+     FLOATING GAME CHAT
+========================= -->
+
+<div id="gameChat" class="game-chat hidden">
+
+    <button
+        class="chat-toggle"
+        onclick="toggleGameChat()"
+    >
+        💬
+    </button>
+
+    <div id="gameChatPanel" class="chat-panel hidden">
+
+        <div class="chat-panel-title">
+            💬 Room Chat
         </div>
 
-        <div
-            id="voteClues"
-            class="clueList"
-            style="margin-top:0;margin-bottom:18px"
-        ></div>
+        <div id="gameChatMessages" class="chat-messages"></div>
 
-        <div
-            id="voteGrid"
-            class="voteGrid"
-        ></div>
+        <div class="chat-form">
 
-        <div
-            id="voteStatus"
-            class="notice hidden"
-            style="margin-top:14px;text-align:center"
-        >
-            Vote lo sudah masuk. Tunggu pemain lain...
+            <input
+                id="gameChatInput"
+                class="chat-input"
+                maxlength="180"
+                placeholder="Ketik sesuatu..."
+            >
+
+            <button
+                class="chat-send"
+                onclick="sendChatFrom('gameChatInput')"
+            >
+                ➤
+            </button>
+
         </div>
 
     </div>
-</section>
 
+</div>
 
-<!-- =====================================================
-     ROUND RESULT
-===================================================== -->
-
-<section id="resultScreen" class="screen hidden">
-
-    <div class="logo">
-        <div id="roundResultIcon" class="logoEmoji">
-            🎭
-        </div>
-
-        <h1 style="font-size:43px">
-            ROUND RESULT
-        </h1>
-
-        <p id="roundResultSub">
-            Let's see what happened.
-        </p>
-    </div>
-
-    <div class="card result">
-
-        <div
-            id="roundResultText"
-            class="resultText"
-        ></div>
-
-        <div
-            id="roundScoreList"
-            class="scoreList"
-        ></div>
-
-        <button
-            id="nextRoundBtn"
-            class="btn primary"
-            onclick="hostNextRound()"
-        >
-            NEXT ROUND
-        </button>
-
-        <div
-            id="nextRoundWaiting"
-            class="notice hidden"
-            style="margin-top:12px"
-        >
-            Waiting for the host to start the next round...
-        </div>
-
-    </div>
-</section>
-
-
-<!-- =====================================================
-     FINAL
-===================================================== -->
-
-<section id="finalScreen" class="screen hidden">
-
-    <div class="logo">
-        <div class="finalIcon">🏆</div>
-
-        <h1 style="font-size:48px">
-            MATCH OVER
-        </h1>
-
-        <p>
-            5 rounds completed.
-        </p>
-    </div>
-
-    <div class="card result">
-
-        <div
-            id="finalWinnerIcon"
-            class="resultIcon"
-        >
-            👑
-        </div>
-
-        <div
-            id="finalWinnerName"
-            class="winnerName"
-        >
-            -
-        </div>
-
-        <div class="resultText">
-            wins the match!
-        </div>
-
-        <div
-            id="finalScoreList"
-            class="scoreList"
-        ></div>
-
-        <button
-            class="btn primary"
-            onclick="hostRestartMatch()"
-            id="finalRestartBtn"
-        >
-            PLAY AGAIN
-        </button>
-
-        <div
-            id="finalGuestWait"
-            class="notice hidden"
-            style="margin-top:12px"
-        >
-            Waiting for the host to restart...
-        </div>
-
-    </div>
-</section>
-
+<div id="toast" class="toast">
+    Copied!
 </div>
 
 
 <script>
 
 /* =========================================================
-   CONFIG
+   GLOBAL STATE
 ========================================================= */
 
-const MAX_PLAYERS = 10;
-const MIN_PLAYERS = 2;
+let peer = null;
+let roomCode = "";
+let hostPeerId = "";
+let myId = "";
+let myName = "";
+let isHost = false;
 
-const TOTAL_ROUNDS = 5;
+let players = {};
+let connections = {};
 
-const CLUE_SECONDS = 60;
-const VOTE_SECONDS = 45;
+let currentRound = 0;
+let totalRounds = 5;
+
+let currentWord = "";
+let isImpostor = false;
+
+let selectedVote = null;
+
+let clueTimerInterval = null;
+let voteTimerInterval = null;
+
+let clues = {};
+let votes = {};
+
+let messages = [];
+
+let gameStarted = false;
 
 
 /* =========================================================
-   WORD DATABASE
+   WORDS
 ========================================================= */
 
-const WORDS = [
+const WORD_PAIRS = [
 
-    "ICE CREAM",
-    "PIZZA",
-    "BEACH",
-    "SCHOOL",
-    "CINEMA",
-    "COFFEE",
-    "CAT",
-    "DOG",
-    "RAIN",
-    "MOUNTAIN",
-
-    "PHONE",
-    "AIRPORT",
-    "LIBRARY",
-    "HOSPITAL",
-    "BASKETBALL",
-    "MUSIC",
-    "CHOCOLATE",
-    "BURGER",
-    "SUPERMARKET",
-    "ZOO",
-
-    "PARK",
-    "TELEVISION",
-    "LAPTOP",
-    "KEYBOARD",
-    "BIRTHDAY",
-    "WEDDING",
-    "SUMMER",
-    "WINTER",
-    "SCHOOL BUS",
-    "TEACHER",
-
-    "DOCTOR",
-    "POLICE",
-    "FIRETRUCK",
-    "RESTAURANT",
-    "HOTEL",
-    "MUSEUM",
-    "CONCERT",
-    "GUITAR",
-    "PIANO",
-    "FOOTBALL",
-
-    "CAMPING",
-    "FOREST",
-    "ISLAND",
-    "VOLCANO",
-    "DESERT",
-    "RIVER",
-    "WATERFALL",
-    "SUNSET",
-    "MOON",
-    "STAR",
-
-    "PENCIL",
-    "BOOK",
-    "BACKPACK",
-    "UMBRELLA",
-    "CAMERA",
-    "HEADPHONES",
-    "SNEAKERS",
-    "JACKET",
-    "WATCH",
-    "GLASSES",
-
-    "CAKE",
-    "NOODLES",
-    "SUSHI",
-    "FRIES",
-    "DONUT",
-    "POPCORN",
-    "PANCAKE",
-    "SANDWICH",
-    "COOKIE",
-    "WATERMELON"
+    ["Pizza","Burger"],
+    ["Kucing","Anjing"],
+    ["Pantai","Kolam Renang"],
+    ["Sekolah","Kampus"],
+    ["Hujan","Salju"],
+    ["Kopi","Teh"],
+    ["Sepeda","Motor"],
+    ["Film","Series"],
+    ["Buku","Komik"],
+    ["Gunung","Bukit"],
+    ["Nasi Goreng","Mie Goreng"],
+    ["WhatsApp","Telegram"],
+    ["Instagram","TikTok"],
+    ["Bola","Basket"],
+    ["Laptop","Komputer"],
+    ["Kamera","HP"],
+    ["Kucing","Harimau"],
+    ["Ayam","Bebek"],
+    ["Mall","Pasar"],
+    ["Dokter","Perawat"],
+    ["Guru","Dosen"],
+    ["Pesawat","Helikopter"],
+    ["Kereta","Bus"],
+    ["Es Krim","Kue"],
+    ["Matahari","Bulan"],
+    ["Bintang","Awan"],
+    ["Laut","Sungai"],
+    ["Pulpen","Pensil"],
+    ["Jam","Kalender"]
 
 ];
 
 
 /* =========================================================
-   STATE
-========================================================= */
-
-let peer = null;
-
-let myConn = null;
-
-let isHost = false;
-
-let connected = false;
-
-let roomCode = "";
-
-let myId = "";
-
-let myName = "";
-
-let round = 1;
-
-let phase = "lobby";
-
-let clueTimer = null;
-
-let voteTimer = null;
-
-let clueSecondsLeft = CLUE_SECONDS;
-
-let voteSecondsLeft = VOTE_SECONDS;
-
-let myClue = "";
-
-let myVote = null;
-
-let matchStarted = false;
-
-let messages = [];
-
-let players = {};
-
-let gameState = {
-
-    round:1,
-
-    normalWord:"",
-
-    impostorId:"",
-
-    clues:{},
-
-    votes:{}
-
-};
-
-
-/* =========================================================
-   UTILITIES
+   HELPERS
 ========================================================= */
 
 function $(id){
     return document.getElementById(id);
 }
 
+function showToast(text){
+    const toast = $("toast");
+
+    toast.textContent = text;
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+        toast.classList.remove("show");
+    },1800);
+}
 
 function showScreen(id){
 
-    document.querySelectorAll(".screen").forEach(el=>{
-        el.classList.add("hidden");
+    document.querySelectorAll(".screen").forEach(screen=>{
+        screen.classList.add("hidden");
     });
 
     $(id).classList.remove("hidden");
 
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
-    });
+    updateFloatingChat();
+}
+
+function showHome(){
+    showScreen("homeScreen");
+}
+
+function showCreate(){
+    showScreen("createScreen");
+}
+
+function showJoin(){
+    showScreen("joinScreen");
 }
 
 
-function escapeHtml(str){
-
-    return String(str)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-}
-
-
-function randomItem(arr){
-
-    return arr[
-        Math.floor(Math.random()*arr.length)
-    ];
-}
-
+/* =========================================================
+   ROOM CODE
+========================================================= */
 
 function generateRoomCode(){
 
-    const chars =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
     let code = "";
 
     for(let i=0;i<5;i++){
-
-        code += chars[
-            Math.floor(Math.random()*chars.length)
-        ];
-
+        code += chars[Math.floor(Math.random()*chars.length)];
     }
 
     return code;
 }
 
 
-function playerArray(){
-
-    return Object.values(players)
-        .filter(p=>p && p.id);
-}
-
-
-function setStatus(text,type="loading"){
-
-    const dotClass =
-        type === "ok"
-            ? "dot ok"
-            : type === "error"
-                ? "dot error"
-                : "dot loading";
-
-    $("connectionStatus").innerHTML =
-        `<span class="${dotClass}"></span>
-         <span>${escapeHtml(text)}</span>`;
-}
-
-
-function homeError(text){
-
-    $("homeError").textContent = text;
-
-    $("homeError").classList.remove("hidden");
-}
-
-
-function lobbyError(text){
-
-    $("lobbyError").textContent = text;
-
-    $("lobbyError").classList.remove("hidden");
-}
-
-
-function clearErrors(){
-
-    $("homeError").classList.add("hidden");
-
-    $("lobbyError").classList.add("hidden");
-}
-
-
 /* =========================================================
-   PLAYERS
+   PLAYER HELPERS
 ========================================================= */
 
-function renderPlayers(){
+function playerArray(){
 
-    const grid = $("playersGrid");
+    return Object.values(players);
 
-    grid.innerHTML = "";
-
-    const list = playerArray();
-
-    list.sort((a,b)=>a.joinedAt-b.joinedAt);
-
-    $("playerCount").textContent =
-        `(${list.length}/${MAX_PLAYERS})`;
-
-
-    list.forEach((p,index)=>{
-
-        const div = document.createElement("div");
-
-        div.className = "playerCard";
-
-        div.innerHTML = `
-
-            ${index === 0
-                ? `<div class="hostTag">HOST</div>`
-                : ""
-            }
-
-            <div class="playerAvatar">
-                ${avatarFor(index)}
-            </div>
-
-            <div class="playerName">
-                ${escapeHtml(p.name)}
-            </div>
-
-            <div class="playerStatus">
-                ${p.connected ? "● ONLINE" : "OFFLINE"}
-            </div>
-        `;
-
-        grid.appendChild(div);
-
-    });
-
-
-    if(isHost){
-
-        const count = list.length;
-
-        $("startBtn").disabled =
-            count < MIN_PLAYERS;
-
-        if(count < MIN_PLAYERS){
-
-            $("startBtn").textContent =
-                `NEED ${MIN_PLAYERS-count} MORE PLAYER`;
-
-        }else{
-
-            $("startBtn").textContent =
-                `START MATCH · ${count} PLAYERS`;
-
-        }
-
-    }
 }
 
+function connectedPlayers(){
 
-function avatarFor(index){
+    return playerArray().filter(p=>p.connected !== false);
 
-    const avatars = [
-        "😎",
-        "👀",
-        "😈",
-        "🤨",
-        "🧐",
-        "😏",
-        "🤠",
-        "🥸",
-        "🤓",
-        "😼"
-    ];
+}
 
-    return avatars[index % avatars.length];
+function playerCount(){
+
+    return connectedPlayers().length;
+
 }
 
 
@@ -1622,179 +1354,68 @@ function avatarFor(index){
 
 function createRoom(){
 
-    clearErrors();
-
-    myName = $("homeName")
-        .value
-        .trim();
+    myName = $("hostName").value.trim();
 
     if(!myName){
-
-        homeError("Isi nama lo dulu.");
-
+        showToast("Isi nama lu dulu.");
         return;
     }
-
-
-    isHost = true;
 
     roomCode = generateRoomCode();
 
-    players = {};
+    hostPeerId = "IMP-" + roomCode;
 
-    myId = "";
+    isHost = true;
 
-    players["host"] = {
+    $("roomStatus").textContent = "Connecting room...";
 
-        id:"host",
+    peer = new Peer(hostPeerId);
 
-        name:myName,
-
-        connected:true,
-
-        joinedAt:Date.now(),
-
-        isHost:true
-
-    };
-
-
-    $("roomCodeDisplay").textContent =
-        roomCode;
-
-    $("hostControls").classList.remove("hidden");
-
-    $("guestControls").classList.add("hidden");
-
-    renderPlayers();
-
-    showScreen("lobby");
-
-    createHostPeer();
-
-}
-
-
-/* =========================================================
-   HOST PEER
-========================================================= */
-
-function createHostPeer(){
-
-    cleanupPeerOnly();
-
-    setStatus(
-        "Creating room...",
-        "loading"
-    );
-
-
-    const hostPeerId =
-        "IMPOSTOR-" + roomCode;
-
-
-    try{
-
-        peer = new Peer(hostPeerId,{
-            debug:0
-        });
-
-    }catch(err){
-
-        lobbyError(
-            "Browser tidak bisa membuat koneksi."
-        );
-
-        setStatus(
-            "Connection error",
-            "error"
-        );
-
-        return;
-    }
-
-
-    peer.on("open",id=>{
+    peer.on("open", id=>{
 
         myId = id;
 
-        setStatus(
-            "Room ready · waiting for players",
-            "ok"
-        );
+        players = {};
+
+        players[myId] = {
+
+            id:myId,
+            name:myName,
+            avatar:"😎",
+            host:true,
+            connected:true,
+            conn:null,
+            score:0
+
+        };
+
+        $("roomCodeText").textContent = roomCode;
+
+        showScreen("lobbyScreen");
+
+        updateLobby();
+
+        addSystemChat(myName + " created the room ✨");
+
+        $("roomStatus").textContent =
+            "Room ready · waiting for players";
 
     });
 
+    peer.on("connection", conn=>{
 
-    peer.on("connection",incoming=>{
-
-        handleIncomingGuest(incoming);
-
-    });
-
-
-    peer.on("error",err=>{
-
-        console.error("HOST PEER ERROR",err);
-
-
-        if(err.type === "unavailable-id"){
-
-            /*
-              Extremely unlikely collision.
-              Generate a fresh room.
-            */
-
-            roomCode =
-                generateRoomCode();
-
-            $("roomCodeDisplay").textContent =
-                roomCode;
-
-            setTimeout(()=>{
-                createHostPeer();
-            },300);
-
-            return;
-        }
-
-
-        if(err.type === "network"){
-
-            setStatus(
-                "Network issue · reconnecting...",
-                "error"
-            );
-
-            return;
-        }
-
-
-        setStatus(
-            "Connection error",
-            "error"
-        );
+        handleGuestConnection(conn);
 
     });
 
+    peer.on("error", err=>{
 
-    peer.on("disconnected",()=>{
+        console.error(err);
 
-        if(!peer || peer.destroyed)
-            return;
+        $("roomStatus").textContent =
+            "Connection error";
 
-        setStatus(
-            "Reconnecting...",
-            "loading"
-        );
-
-        setTimeout(()=>{
-
-            try{
-                peer.reconnect();
-            }catch(e){}
-
-        },1000);
+        showToast("Gagal membuat room.");
 
     });
 
@@ -1802,128 +1423,46 @@ function createHostPeer(){
 
 
 /* =========================================================
-   HOST ACCEPT GUEST
+   HANDLE GUEST
 ========================================================= */
 
-function handleIncomingGuest(conn){
-
-    /*
-      Count only actual players.
-    */
-
-    const count =
-        playerArray().length;
-
-
-    if(count >= MAX_PLAYERS){
-
-        conn.on("open",()=>{
-
-            try{
-
-                conn.send({
-                    type:"roomFull"
-                });
-
-                conn.close();
-
-            }catch(e){}
-
-        });
-
-        return;
-    }
-
-
-    /*
-      Each guest connection is stored separately.
-    */
-
-    const guest = {
-
-        conn:conn,
-
-        id:null,
-
-        name:"Player",
-
-        connected:false,
-
-        joinedAt:Date.now(),
-
-        isHost:false
-
-    };
-
+function handleGuestConnection(conn){
 
     conn.on("open",()=>{
 
-        /*
-          Guest hasn't identified itself yet.
-          Ask for handshake.
-        */
-
-        try{
-
-            conn.send({
-                type:"requestHello"
-            });
-
-        }catch(e){}
+        conn.send({
+            type:"requestHello"
+        });
 
     });
-
 
     conn.on("data",data=>{
 
-        if(
-            data &&
-            data.type === "guestHello"
-        ){
-
-            registerGuest(
-                guest,
-                data
-            );
-
-            return;
-        }
-
-
-        if(
-            data &&
-            guest.id
-        ){
-
-            handleGuestData(
-                guest,
-                data
-            );
-
-        }
+        handleHostData(conn,data);
 
     });
-
 
     conn.on("close",()=>{
 
-        if(guest.id){
+        const id = conn.peer;
 
-            disconnectGuest(
-                guest.id
+        if(players[id]){
+
+            players[id].connected = false;
+
+            addSystemChat(
+                players[id].name + " left the room."
             );
+
+            updateLobby();
 
         }
 
     });
 
-
     conn.on("error",err=>{
 
-        console.log(
-            "Guest connection error",
-            err
-        );
+        console.error("Guest connection:",err);
 
     });
 
@@ -1931,119 +1470,144 @@ function handleIncomingGuest(conn){
 
 
 /* =========================================================
-   REGISTER GUEST
+   HOST DATA
 ========================================================= */
 
-function registerGuest(guest,data){
+function handleHostData(conn,data){
 
-    if(guest.id)
-        return;
-
-
-    const playerId =
-        String(data.playerId || "")
-            .trim();
+    if(!data || !data.type) return;
 
 
-    if(!playerId)
-        return;
+    /* -------------------------
+       HELLO
+    ------------------------- */
 
+    if(data.type === "guestHello"){
 
-    /*
-      Prevent duplicate IDs.
-    */
+        const id = conn.peer;
 
-    if(players[playerId]){
+        if(playerCount() >= 10){
 
-        try{
-
-            guest.conn.send({
-                type:"duplicate"
-            });
-
-            guest.conn.close();
-
-        }catch(e){}
-
-        return;
-    }
-
-
-    if(
-        playerArray().length >= MAX_PLAYERS
-    ){
-
-        try{
-
-            guest.conn.send({
+            conn.send({
                 type:"roomFull"
             });
 
-            guest.conn.close();
+            conn.close();
 
-        }catch(e){}
+            return;
+        }
 
-        return;
-    }
+        players[id] = {
 
+            id:id,
+            name:data.name || "Player",
+            avatar:data.avatar || "👀",
+            host:false,
+            connected:true,
+            conn:conn,
+            score:0
 
-    guest.id = playerId;
+        };
 
-    guest.name =
-        String(data.name || "Player")
-            .slice(0,18);
+        connections[id] = conn;
 
-    guest.connected = true;
+        conn.send({
+            type:"guestAccepted",
+            roomCode:roomCode,
+            players:serializePlayers()
+        });
 
+        broadcast({
 
-    players[playerId] = {
-
-        id:playerId,
-
-        name:guest.name,
-
-        connected:true,
-
-        joinedAt:guest.joinedAt,
-
-        isHost:false,
-
-        conn:guest.conn
-
-    };
-
-
-    /*
-      Confirm guest.
-    */
-
-    try{
-
-        guest.conn.send({
-
-            type:"welcome",
-
-            hostName:myName,
-
+            type:"playersUpdate",
             players:serializePlayers()
 
         });
 
-    }catch(e){}
+        addSystemChat(
+            players[id].name + " joined the room 👋"
+        );
+
+        updateLobby();
+
+        return;
+    }
 
 
-    /*
-      Send current player list to EVERYONE.
-    */
+    /* -------------------------
+       CHAT FROM GUEST
+    ------------------------- */
 
-    broadcastPlayers();
+    if(data.type === "chat"){
 
-    renderPlayers();
+        const sender = players[conn.peer];
+
+        if(!sender) return;
+
+        const message = {
+
+            type:"chatMessage",
+            id:Date.now()+"_"+Math.random(),
+            senderId:sender.id,
+            senderName:sender.name,
+            text:String(data.text).slice(0,180),
+            system:false
+
+        };
+
+        messages.push(message);
+
+        /* host sees it */
+        renderAllChats();
+
+        /* every guest sees it */
+        broadcast(message);
+
+        return;
+    }
 
 
-    addSystemChat(
-        `${guest.name} joined the room 👋`
-    );
+    /* -------------------------
+       CLUE
+    ------------------------- */
+
+    if(data.type === "clue"){
+
+        if(!gameStarted) return;
+
+        clues[conn.peer] = String(data.text).slice(0,80);
+
+        broadcast({
+            type:"clueUpdate",
+            clues:clues
+        });
+
+        checkAllClues();
+
+        return;
+    }
+
+
+    /* -------------------------
+       VOTE
+    ------------------------- */
+
+    if(data.type === "vote"){
+
+        if(!gameStarted) return;
+
+        votes[conn.peer] = data.target;
+
+        broadcast({
+            type:"voteProgress",
+            count:Object.keys(votes).length,
+            total:playerCount()
+        });
+
+        checkAllVotes();
+
+        return;
+    }
 
 }
 
@@ -2054,20 +1618,16 @@ function registerGuest(guest,data){
 
 function serializePlayers(){
 
-    return playerArray()
-        .map(p=>({
+    return playerArray().map(p=>({
 
-            id:p.id,
+        id:p.id,
+        name:p.name,
+        avatar:p.avatar,
+        host:p.host,
+        connected:p.connected !== false,
+        score:p.score || 0
 
-            name:p.name,
-
-            connected:p.connected,
-
-            joinedAt:p.joinedAt,
-
-            isHost:p.isHost
-
-        }));
+    }));
 
 }
 
@@ -2078,209 +1638,22 @@ function serializePlayers(){
 
 function broadcast(data){
 
-    playerArray().forEach(p=>{
-
-        if(p.isHost)
-            return;
+    Object.values(connections).forEach(conn=>{
 
         if(
-            p.conn &&
-            p.connected
+            conn &&
+            conn.open
         ){
 
             try{
-
-                p.conn.send(data);
-
-            }catch(e){}
+                conn.send(data);
+            }catch(e){
+                console.error(e);
+            }
 
         }
 
     });
-
-}
-
-
-function broadcastPlayers(){
-
-    const data = {
-
-        type:"players",
-
-        players:serializePlayers()
-
-    };
-
-
-    broadcast(data);
-
-}
-
-
-/* =========================================================
-   GUEST DATA ON HOST
-========================================================= */
-
-function handleGuestData(guest,data){
-
-    if(!data || !data.type)
-        return;
-
-
-    /*
-      CHAT
-    */
-
-    if(data.type === "chat"){
-
-        const sender =
-            players[guest.id];
-
-        if(!sender)
-            return;
-
-
-        const msg = {
-
-            id:
-                Date.now() +
-                Math.random(),
-
-            name:sender.name,
-
-            text:
-                String(data.text || "")
-                    .slice(0,120),
-
-            system:false
-
-        };
-
-
-        addChatLocal(msg);
-
-        broadcast({
-            type:"chat",
-            message:msg
-        });
-
-        return;
-    }
-
-
-    /*
-      CLUE
-    */
-
-    if(data.type === "clue"){
-
-        if(
-            !matchStarted ||
-            phase !== "clue"
-        )
-            return;
-
-
-        if(
-            gameState.clues[guest.id]
-        )
-            return;
-
-
-        gameState.clues[guest.id] =
-            String(data.clue || "")
-                .slice(0,100);
-
-
-        broadcast({
-            type:"cluesUpdate",
-            clues:gameState.clues
-        });
-
-
-        checkAllClues();
-
-        return;
-    }
-
-
-    /*
-      VOTE
-    */
-
-    if(data.type === "vote"){
-
-        if(
-            !matchStarted ||
-            phase !== "vote"
-        )
-            return;
-
-
-        if(
-            gameState.votes[guest.id]
-        )
-            return;
-
-
-        gameState.votes[guest.id] =
-            data.vote;
-
-
-        broadcast({
-            type:"votesUpdate",
-            votes:gameState.votes
-        });
-
-
-        checkAllVotes();
-
-        return;
-    }
-
-
-    /*
-      READY NEXT
-    */
-
-    if(data.type === "nextRound"){
-
-        return;
-    }
-
-}
-
-
-/* =========================================================
-   DISCONNECT GUEST
-========================================================= */
-
-function disconnectGuest(id){
-
-    if(!players[id])
-        return;
-
-
-    const name =
-        players[id].name;
-
-
-    players[id].connected =
-        false;
-
-
-    /*
-      During a match, keep the player in score/player list,
-      but don't let disconnected player block a phase.
-    */
-
-    broadcastPlayers();
-
-    renderPlayers();
-
-    addSystemChat(
-        `${name} disconnected.`
-    );
 
 }
 
@@ -2291,435 +1664,250 @@ function disconnectGuest(id){
 
 function joinRoom(){
 
-    clearErrors();
+    myName = $("guestName").value.trim();
 
-    myName =
-        $("homeName")
-            .value
-            .trim();
-
-    roomCode =
-        $("joinCode")
-            .value
-            .trim()
-            .toUpperCase();
-
+    const code = $("joinCode").value.trim().toUpperCase();
 
     if(!myName){
 
-        homeError(
-            "Isi nama lo dulu."
-        );
+        showToast("Isi nama lu dulu.");
 
         return;
     }
 
+    if(code.length !== 5){
 
-    if(roomCode.length !== 5){
-
-        homeError(
-            "Room code harus 5 karakter."
-        );
+        showToast("Kode room harus 5 karakter.");
 
         return;
     }
 
+    roomCode = code;
+
+    hostPeerId = "IMP-" + roomCode;
 
     isHost = false;
 
-    myId =
-        "P-" +
-        Date.now().toString(36) +
-        "-" +
-        Math.random()
-            .toString(36)
-            .slice(2,7);
-
-
-    $("roomCodeDisplay").textContent =
-        roomCode;
-
-
-    $("hostControls")
-        .classList
-        .add("hidden");
-
-    $("guestControls")
-        .classList
-        .remove("hidden");
-
-
-    $("retryBtn")
-        .classList
-        .add("hidden");
-
-
-    $("guestWaitingText").textContent =
+    $("roomStatus").textContent =
         "Connecting to host...";
 
-
-    showScreen("lobby");
-
-
-    createGuestPeer();
-
-}
-
-
-/* =========================================================
-   CREATE GUEST PEER
-========================================================= */
-
-function createGuestPeer(){
-
-    cleanupPeerOnly();
-
-    connected = false;
-
-
-    setStatus(
-        "Preparing your connection...",
-        "loading"
-    );
-
-
-    try{
-
-        peer = new Peer(undefined,{
-            debug:0
-        });
-
-    }catch(err){
-
-        guestFailed(
-            "Browser gagal membuat koneksi."
-        );
-
-        return;
-    }
-
+    peer = new Peer();
 
     peer.on("open",id=>{
 
         myId = id;
 
-        connectToHost();
-
-    });
-
-
-    peer.on("error",err=>{
-
-        console.error(
-            "GUEST PEER ERROR",
-            err
+        const conn = peer.connect(
+            hostPeerId,
+            {
+                reliable:true
+            }
         );
 
+        connections.host = conn;
 
-        if(
-            err.type === "peer-unavailable"
-        ){
+        conn.on("open",()=>{
 
-            guestFailed(
-                "Room tidak ditemukan. Cek kode room dan pastikan host masih membuka game."
-            );
-
-            return;
-        }
-
-
-        if(
-            err.type === "network"
-        ){
-
-            setStatus(
-                "Network problem...",
-                "error"
-            );
-
-            return;
-        }
-
-    });
-
-
-    peer.on("disconnected",()=>{
-
-        if(!peer || peer.destroyed)
-            return;
-
-
-        setStatus(
-            "Reconnecting...",
-            "loading"
-        );
-
-
-        setTimeout(()=>{
-
-            try{
-
-                peer.reconnect();
-
-            }catch(e){}
-
-        },1000);
-
-    });
-
-
-    /*
-      Give the PeerJS server enough time.
-    */
-
-    setTimeout(()=>{
-
-        if(!connected){
-
-            guestFailed(
-                "Gagal connect. Coba tekan TRY AGAIN."
-            );
-
-        }
-
-    },15000);
-
-}
-
-
-/* =========================================================
-   CONNECT GUEST TO HOST
-========================================================= */
-
-function connectToHost(){
-
-    const hostId =
-        "IMPOSTOR-" + roomCode;
-
-
-    setStatus(
-        "Connecting to room...",
-        "loading"
-    );
-
-
-    let c;
-
-
-    try{
-
-        c =
-            peer.connect(
-                hostId,
-                {
-                    reliable:true
-                }
-            );
-
-    }catch(err){
-
-        guestFailed(
-            "Tidak bisa membuka koneksi."
-        );
-
-        return;
-    }
-
-
-    myConn = c;
-
-
-    c.on("open",()=>{
-
-        connected = true;
-
-
-        setStatus(
-            "Connected!",
-            "ok"
-        );
-
-
-        $("guestWaitingText").textContent =
-            "Connected! Waiting for the host...";
-
-
-        /*
-          CRITICAL HANDSHAKE.
-        */
-
-        c.send({
-
-            type:"guestHello",
-
-            playerId:myId,
-
-            name:myName
-
-        });
-
-    });
-
-
-    c.on("data",data=>{
-
-        handleGuestMessage(data);
-
-    });
-
-
-    c.on("close",()=>{
-
-        connected = false;
-
-        setStatus(
-            "Connection closed.",
-            "error"
-        );
-
-        $("retryBtn")
-            .classList
-            .remove("hidden");
-
-    });
-
-
-    c.on("error",err=>{
-
-        console.error(
-            "GUEST CONNECTION ERROR",
-            err
-        );
-
-    });
-
-}
-
-
-/* =========================================================
-   GUEST MESSAGE
-========================================================= */
-
-function handleGuestMessage(data){
-
-    if(!data || !data.type)
-        return;
-
-
-    if(data.type === "requestHello"){
-
-        if(myConn && myConn.open){
-
-            myConn.send({
+            conn.send({
 
                 type:"guestHello",
-
-                playerId:myId,
-
-                name:myName
+                name:myName,
+                avatar:getRandomAvatar()
 
             });
 
+        });
+
+        conn.on("data",data=>{
+
+            handleGuestData(data);
+
+        });
+
+        conn.on("close",()=>{
+
+            showToast("Host keluar dari room.");
+
+            $("roomStatus").textContent =
+                "Disconnected from host";
+
+        });
+
+        conn.on("error",err=>{
+
+            console.error(err);
+
+            showToast(
+                "Gagal connect. Cek kode room."
+            );
+
+        });
+
+    });
+
+    peer.on("error",err=>{
+
+        console.error(err);
+
+        if(err.type === "peer-unavailable"){
+
+            showToast(
+                "Room nggak ditemukan / host offline."
+            );
+
+        }else{
+
+            showToast("Connection error.");
+
         }
 
+    });
+
+}
+
+
+/* =========================================================
+   GUEST DATA
+========================================================= */
+
+function handleGuestData(data){
+
+    if(!data || !data.type) return;
+
+
+    /* -------------------------
+       ROOM FULL
+    ------------------------- */
+
+    if(data.type === "roomFull"){
+
+        showToast("Room sudah penuh.");
+
         return;
     }
 
 
-    if(data.type === "welcome"){
+    /* -------------------------
+       ACCEPTED
+    ------------------------- */
 
-        connected = true;
+    if(data.type === "guestAccepted"){
 
-        setStatus(
-            "Connected to " + data.hostName,
-            "ok"
-        );
-
-
-        $("guestWaitingText").textContent =
-            "You're in! Waiting for the host...";
-
+        roomCode = data.roomCode;
 
         players = {};
-
 
         data.players.forEach(p=>{
 
             players[p.id] = {
-                ...p
+                ...p,
+                connected:p.connected !== false
             };
 
         });
 
+        $("roomCodeText").textContent =
+            roomCode;
 
-        renderPlayers();
+        showScreen("lobbyScreen");
+
+        updateLobby();
 
         return;
     }
 
 
-    if(data.type === "players"){
+    /* -------------------------
+       PLAYER UPDATE
+    ------------------------- */
 
-        players = {};
-
+    if(data.type === "playersUpdate"){
 
         data.players.forEach(p=>{
 
             players[p.id] = {
+
+                ...players[p.id],
                 ...p
+
             };
 
         });
 
+        updateLobby();
 
-        renderPlayers();
+        return;
+    }
+
+
+    /* -------------------------
+       CHAT
+    ------------------------- */
+
+    if(data.type === "chatMessage"){
+
+        messages.push(data);
+
+        renderAllChats();
 
         return;
     }
 
 
-    if(data.type === "chat"){
-
-        addChatLocal(
-            data.message
-        );
-
-        return;
-    }
-
+    /* -------------------------
+       CHAT SYSTEM
+    ------------------------- */
 
     if(data.type === "chatSystem"){
 
-        addSystemChat(
-            data.text
-        );
+        messages.push({
+
+            type:"chatMessage",
+            id:Date.now()+"_"+Math.random(),
+            senderId:"system",
+            senderName:"",
+            text:data.text,
+            system:true
+
+        });
+
+        renderAllChats();
 
         return;
     }
 
 
-    if(data.type === "startMatch"){
+    /* -------------------------
+       START ROUND
+    ------------------------- */
 
-        receiveStartMatch(data);
+    if(data.type === "roundStart"){
 
-        return;
-    }
-
-
-    if(data.type === "cluesUpdate"){
-
-        gameState.clues =
-            data.clues || {};
-
-        renderClueList();
-
-        updateClueStatus();
+        receiveRoundStart(data);
 
         return;
     }
 
 
-    if(data.type === "beginVote"){
+    /* -------------------------
+       CLUE UPDATE
+    ------------------------- */
+
+    if(data.type === "clueUpdate"){
+
+        clues = data.clues || {};
+
+        renderClues();
+
+        return;
+    }
+
+
+    /* -------------------------
+       VOTE START
+    ------------------------- */
+
+    if(data.type === "voteStart"){
 
         receiveVoteStart(data);
 
@@ -2727,14 +1915,22 @@ function handleGuestMessage(data){
     }
 
 
-    if(data.type === "votesUpdate"){
+    /* -------------------------
+       VOTE PROGRESS
+    ------------------------- */
 
-        gameState.votes =
-            data.votes || {};
+    if(data.type === "voteProgress"){
+
+        $("voteStatus").textContent =
+            `${data.count}/${data.total} players sudah vote`;
 
         return;
     }
 
+
+    /* -------------------------
+       ROUND RESULT
+    ------------------------- */
 
     if(data.type === "roundResult"){
 
@@ -2744,37 +1940,13 @@ function handleGuestMessage(data){
     }
 
 
-    if(data.type === "finalResult"){
+    /* -------------------------
+       FINAL
+    ------------------------- */
 
-        receiveFinalResult(data);
+    if(data.type === "final"){
 
-        return;
-    }
-
-
-    if(data.type === "newRound"){
-
-        receiveNewRound(data);
-
-        return;
-    }
-
-
-    if(data.type === "roomFull"){
-
-        guestFailed(
-            "Room ini sudah penuh. Maksimal 10 pemain."
-        );
-
-        return;
-    }
-
-
-    if(data.type === "duplicate"){
-
-        guestFailed(
-            "Koneksi duplikat. Coba join lagi."
-        );
+        receiveFinal(data);
 
         return;
     }
@@ -2783,41 +1955,143 @@ function handleGuestMessage(data){
 
 
 /* =========================================================
-   GUEST FAILED
+   AVATARS
 ========================================================= */
 
-function guestFailed(message){
+function getRandomAvatar(){
 
-    connected = false;
+    const avatars = [
+        "😎",
+        "👀",
+        "🤨",
+        "😏",
+        "🤓",
+        "🥶",
+        "🤠",
+        "👻",
+        "🐸",
+        "🗿"
+    ];
 
-    setStatus(
-        message,
-        "error"
-    );
-
-
-    $("guestWaitingText").textContent =
-        message;
-
-
-    $("retryBtn")
-        .classList
-        .remove("hidden");
+    return avatars[
+        Math.floor(Math.random()*avatars.length)
+    ];
 
 }
 
 
 /* =========================================================
-   RETRY
+   LOBBY UI
 ========================================================= */
 
-function retryJoin(){
+function updateLobby(){
 
-    $("retryBtn")
-        .classList
-        .add("hidden");
+    $("playerCount").textContent =
+        playerCount();
 
-    createGuestPeer();
+    const grid = $("playersGrid");
+
+    grid.innerHTML = "";
+
+    connectedPlayers().forEach(player=>{
+
+        const div = document.createElement("div");
+
+        div.className = "player";
+
+        div.innerHTML = `
+
+            ${
+                player.host
+                ? `<div class="host-badge">HOST</div>`
+                : ""
+            }
+
+            <div class="player-avatar">
+                ${player.avatar}
+            </div>
+
+            <div class="player-name">
+                ${escapeHtml(player.name)}
+            </div>
+
+            <div class="player-online">
+                ● ONLINE
+            </div>
+
+        `;
+
+        grid.appendChild(div);
+
+    });
+
+
+    if(isHost){
+
+        $("waitingText").classList.add("hidden");
+
+        if(playerCount() >= 2){
+
+            $("startButton").classList.remove("hidden");
+
+            $("startButton").textContent =
+                `START MATCH · ${playerCount()} PLAYERS`;
+
+        }else{
+
+            $("startButton").classList.add("hidden");
+
+        }
+
+    }else{
+
+        $("startButton").classList.add("hidden");
+
+        $("waitingText").classList.remove("hidden");
+
+        $("waitingText").textContent =
+            "Waiting for host to start...";
+    }
+
+}
+
+
+/* =========================================================
+   COPY ROOM CODE
+========================================================= */
+
+async function copyRoomCode(){
+
+    if(!roomCode) return;
+
+    try{
+
+        await navigator.clipboard.writeText(roomCode);
+
+        showToast(
+            "Room code copied: " + roomCode
+        );
+
+    }catch(e){
+
+        const textarea =
+            document.createElement("textarea");
+
+        textarea.value = roomCode;
+
+        document.body.appendChild(textarea);
+
+        textarea.select();
+
+        document.execCommand("copy");
+
+        textarea.remove();
+
+        showToast(
+            "Room code copied: " + roomCode
+        );
+
+    }
 
 }
 
@@ -2828,28 +2102,45 @@ function retryJoin(){
 
 function shareTelegram(){
 
-    const pageUrl =
-        window.location.href;
+    if(!roomCode) return;
+
+
+    /*
+       Link akan seperti:
+
+       https://website-lu.com/?room=ABCDE
+
+       Jadi saat teman klik,
+       halaman otomatis membaca ?room=ABCDE
+       lalu mengisi kode dan mencoba join.
+    */
+
+    const baseUrl =
+        window.location.origin +
+        window.location.pathname;
+
+    const inviteUrl =
+        baseUrl +
+        "?room=" +
+        encodeURIComponent(roomCode);
 
 
     const text =
-`🕵️ WHO'S THE IMPOSTOR?
+`WOI ikut main sama gua 😭
 
-Join game gue!
+Gua lagi bikin room WHO'S THE IMPOSTOR.
 
-🔑 Room Code: ${roomCode}
+Room code: ${roomCode}
 
-👥 2–10 players
-🎭 5 rounds
-😈 Find the impostor!
+Klik link ini aja, nanti lu langsung masuk ke room gua:
+${inviteUrl}
 
-Klik link ini buat join:
-${pageUrl}`;
+Jangan jadi impostor yang nyebelin ya anjir 😭`;
 
 
     const telegramUrl =
         "https://t.me/share/url?url=" +
-        encodeURIComponent(pageUrl) +
+        encodeURIComponent(inviteUrl) +
         "&text=" +
         encodeURIComponent(text);
 
@@ -2863,102 +2154,1066 @@ ${pageUrl}`;
 
 
 /* =========================================================
-   CHAT
+   AUTO JOIN FROM TELEGRAM LINK
 ========================================================= */
 
-function sendChat(){
+function checkInviteLink(){
 
-    const input =
-        $("chatInput");
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
 
+    const invitedRoom =
+        params.get("room");
+
+    if(!invitedRoom) return;
+
+    $("joinCode").value =
+        invitedRoom.toUpperCase();
+
+    showJoin();
+
+    showToast(
+        "Room code otomatis masuk. Tinggal isi nama lu."
+    );
+
+}
+
+
+/* =========================================================
+   START MATCH
+========================================================= */
+
+function hostStartMatch(){
+
+    if(!isHost) return;
+
+    if(playerCount() < 2){
+
+        showToast(
+            "Minimal harus 2 pemain."
+        );
+
+        return;
+    }
+
+    if(playerCount() > 10){
+
+        showToast(
+            "Maksimal 10 pemain."
+        );
+
+        return;
+    }
+
+    currentRound = 1;
+
+    gameStarted = true;
+
+    connectedPlayers().forEach(p=>{
+        p.score = 0;
+    });
+
+    startRoundForEveryone();
+
+}
+
+
+/* =========================================================
+   START ROUND
+========================================================= */
+
+function startRoundForEveryone(){
+
+    clues = {};
+    votes = {};
+    selectedVote = null;
+
+    const pair =
+        WORD_PAIRS[
+            Math.floor(
+                Math.random()*WORD_PAIRS.length
+            )
+        ];
+
+    const normalWord =
+        Math.random() < .5
+        ? pair[0]
+        : pair[1];
+
+    const impostorWord =
+        normalWord === pair[0]
+        ? pair[1]
+        : pair[0];
+
+
+    const activePlayers =
+        connectedPlayers();
+
+    const impostor =
+        activePlayers[
+            Math.floor(
+                Math.random()*activePlayers.length
+            )
+        ];
+
+
+    activePlayers.forEach(player=>{
+
+        const word =
+            player.id === impostor.id
+            ? impostorWord
+            : normalWord;
+
+        const packet = {
+
+            type:"roundStart",
+
+            round:currentRound,
+
+            totalRounds:totalRounds,
+
+            word:word,
+
+            impostor:
+                player.id === impostor.id
+
+        };
+
+
+        if(player.id === myId){
+
+            receiveRoundStart(packet);
+
+        }else{
+
+            const conn =
+                connections[player.id];
+
+            if(
+                conn &&
+                conn.open
+            ){
+
+                conn.send(packet);
+
+            }
+
+        }
+
+    });
+
+
+    /* host remembers impostor */
+    window.currentImpostorId =
+        impostor.id;
+
+    window.currentNormalWord =
+        normalWord;
+
+    window.currentImpostorWord =
+        impostorWord;
+
+}
+
+
+/* =========================================================
+   RECEIVE ROUND
+========================================================= */
+
+function receiveRoundStart(data){
+
+    currentRound =
+        data.round;
+
+    currentWord =
+        data.word;
+
+    isImpostor =
+        data.impostor;
+
+    clues = {};
+    selectedVote = null;
+
+    $("clueRound").textContent =
+        currentRound;
+
+    $("myWord").textContent =
+        currentWord;
+
+    $("clueInput").value = "";
+
+    $("sendClueButton").disabled = false;
+
+    $("sendClueButton").textContent =
+        "SEND CLUE";
+
+    showScreen("clueScreen");
+
+    startClueTimer(60);
+
+}
+
+
+/* =========================================================
+   CLUE TIMER
+========================================================= */
+
+function startClueTimer(seconds){
+
+    clearInterval(clueTimerInterval);
+
+    let remaining = seconds;
+
+    $("clueTimer").textContent =
+        remaining + "s";
+
+    clueTimerInterval =
+        setInterval(()=>{
+
+            remaining--;
+
+            $("clueTimer").textContent =
+                remaining + "s";
+
+            if(remaining <= 10){
+
+                $("clueTimer")
+                    .classList.add("warning");
+
+            }
+
+            if(remaining <= 0){
+
+                clearInterval(clueTimerInterval);
+
+                if(
+                    !$("sendClueButton").disabled
+                ){
+
+                    submitClue();
+
+                }
+
+            }
+
+        },1000);
+
+}
+
+
+/* =========================================================
+   SUBMIT CLUE
+========================================================= */
+
+function submitClue(){
 
     const text =
-        input.value
-            .trim();
+        $("clueInput").value.trim();
 
+    if(!text){
 
-    if(!text)
+        showToast("Kasih clue dulu.");
+
         return;
+    }
+
+    if($("sendClueButton").disabled) return;
+
+    $("sendClueButton").disabled = true;
+
+    $("sendClueButton").textContent =
+        "CLUE SENT ✓";
 
 
-    input.value = "";
+    if(isHost){
+
+        clues[myId] = text;
+
+        broadcast({
+
+            type:"clueUpdate",
+            clues:clues
+
+        });
+
+        renderClues();
+
+        checkAllClues();
+
+    }else{
+
+        const conn =
+            connections.host;
+
+        if(
+            conn &&
+            conn.open
+        ){
+
+            conn.send({
+
+                type:"clue",
+                text:text
+
+            });
+
+        }
+
+    }
+
+}
 
 
-    const msg = {
+/* =========================================================
+   CLUE CHECK
+========================================================= */
 
-        id:
-            Date.now() +
-            Math.random(),
+function checkAllClues(){
 
-        name:myName,
+    if(!isHost) return;
 
-        text:text.slice(0,120),
+    const active =
+        connectedPlayers();
 
-        system:false
+    const allSubmitted =
+        active.every(
+            p => clues[p.id]
+        );
+
+    if(allSubmitted){
+
+        startVoting();
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER CLUES
+========================================================= */
+
+function renderClues(){
+
+    const list =
+        $("clueList");
+
+    list.innerHTML = "";
+
+    connectedPlayers().forEach(player=>{
+
+        if(!clues[player.id]) return;
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "clue-item";
+
+        div.innerHTML = `
+
+            <div class="clue-name">
+                ${escapeHtml(player.name)}
+            </div>
+
+            <div class="clue-text">
+                ${escapeHtml(clues[player.id])}
+            </div>
+
+        `;
+
+        list.appendChild(div);
+
+    });
+
+}
+
+
+/* =========================================================
+   START VOTING
+========================================================= */
+
+function startVoting(){
+
+    if(!isHost) return;
+
+    clearInterval(clueTimerInterval);
+
+    const packet = {
+
+        type:"voteStart",
+
+        round:currentRound,
+
+        clues:clues,
+
+        players:serializePlayers()
 
     };
 
 
-    /*
-      HOST
-    */
+    receiveVoteStart(packet);
+
+    broadcast(packet);
+
+}
+
+
+/* =========================================================
+   RECEIVE VOTE
+========================================================= */
+
+function receiveVoteStart(data){
+
+    clearInterval(clueTimerInterval);
+
+    clues = data.clues || {};
+
+    selectedVote = null;
+
+    $("voteRound").textContent =
+        data.round;
+
+    $("voteButton").classList.add("hidden");
+
+    $("voteStatus").textContent =
+        "Pilih satu orang.";
+
+    renderClues();
+
+    const choices =
+        $("voteChoices");
+
+    choices.innerHTML = "";
+
+
+    data.players
+        .filter(p=>{
+
+            /*
+               Jangan kasih opsi vote diri sendiri.
+            */
+
+            return p.id !== myId;
+
+        })
+        .forEach(player=>{
+
+            const button =
+                document.createElement("button");
+
+            button.className =
+                "vote";
+
+            button.innerHTML = `
+
+                <span class="vote-avatar">
+                    ${player.avatar}
+                </span>
+
+                <span class="vote-name">
+                    ${escapeHtml(player.name)}
+                </span>
+
+            `;
+
+            button.onclick = ()=>{
+
+                document
+                    .querySelectorAll(".vote")
+                    .forEach(v=>{
+                        v.classList.remove("selected");
+                    });
+
+                button.classList.add("selected");
+
+                selectedVote =
+                    player.id;
+
+                $("voteButton")
+                    .classList.remove("hidden");
+
+            };
+
+            choices.appendChild(button);
+
+        });
+
+
+    showScreen("voteScreen");
+
+    startVoteTimer(45);
+
+}
+
+
+/* =========================================================
+   VOTE TIMER
+========================================================= */
+
+function startVoteTimer(seconds){
+
+    clearInterval(voteTimerInterval);
+
+    let remaining = seconds;
+
+    $("voteTimer").textContent =
+        remaining + "s";
+
+    $("voteTimer")
+        .classList.remove("warning");
+
+    voteTimerInterval =
+        setInterval(()=>{
+
+            remaining--;
+
+            $("voteTimer").textContent =
+                remaining + "s";
+
+            if(remaining <= 10){
+
+                $("voteTimer")
+                    .classList.add("warning");
+
+            }
+
+            if(remaining <= 0){
+
+                clearInterval(voteTimerInterval);
+
+                if(!selectedVote){
+
+                    /*
+                       Kalau nggak vote,
+                       pilih random pemain lain.
+                    */
+
+                    const possible =
+                        connectedPlayers()
+                            .filter(
+                                p=>p.id !== myId
+                            );
+
+                    if(possible.length){
+
+                        selectedVote =
+                            possible[
+                                Math.floor(
+                                    Math.random()*
+                                    possible.length
+                                )
+                            ].id;
+
+                    }
+
+                }
+
+                if(selectedVote){
+
+                    submitVote();
+
+                }
+
+            }
+
+        },1000);
+
+}
+
+
+/* =========================================================
+   SUBMIT VOTE
+========================================================= */
+
+function submitVote(){
+
+    if(!selectedVote) return;
+
+    $("voteButton").disabled = true;
+
+    $("voteStatus").textContent =
+        "Vote lu sudah masuk ✓";
+
 
     if(isHost){
 
-        addChatLocal(msg);
+        votes[myId] =
+            selectedVote;
 
         broadcast({
-            type:"chat",
-            message:msg
-        });
 
-        return;
-    }
+            type:"voteProgress",
 
+            count:Object.keys(votes).length,
 
-    /*
-      GUEST
-    */
-
-    if(
-        myConn &&
-        myConn.open
-    ){
-
-        myConn.send({
-
-            type:"chat",
-
-            text:text
+            total:playerCount()
 
         });
+
+        checkAllVotes();
+
+    }else{
+
+        const conn =
+            connections.host;
+
+        if(
+            conn &&
+            conn.open
+        ){
+
+            conn.send({
+
+                type:"vote",
+
+                target:selectedVote
+
+            });
+
+        }
 
     }
 
 }
 
 
-function addChatLocal(msg){
+/* =========================================================
+   CHECK VOTES
+========================================================= */
 
-    messages.push(msg);
+function checkAllVotes(){
 
-    if(messages.length > 100)
-        messages.shift();
+    if(!isHost) return;
 
+    const active =
+        connectedPlayers();
 
-    renderChat();
+    const allVoted =
+        active.every(
+            p=>votes[p.id]
+        );
+
+    if(allVoted){
+
+        calculateResult();
+
+    }
+
 }
 
+
+/* =========================================================
+   CALCULATE RESULT
+========================================================= */
+
+function calculateResult(){
+
+    clearInterval(voteTimerInterval);
+
+    const impostorId =
+        window.currentImpostorId;
+
+    const voteCounts = {};
+
+
+    Object.values(votes).forEach(target=>{
+
+        voteCounts[target] =
+            (voteCounts[target] || 0) + 1;
+
+    });
+
+
+    let highest = 0;
+    let eliminatedId = null;
+
+    Object.entries(voteCounts).forEach(
+        ([id,count])=>{
+
+            if(count > highest){
+
+                highest = count;
+                eliminatedId = id;
+
+            }
+
+        }
+    );
+
+
+    const caught =
+        eliminatedId === impostorId;
+
+
+    connectedPlayers().forEach(player=>{
+
+        if(caught){
+
+            if(player.id !== impostorId){
+
+                player.score += 2;
+
+            }
+
+            if(votes[player.id] === impostorId){
+
+                player.score += 1;
+
+            }
+
+        }else{
+
+            if(player.id === impostorId){
+
+                player.score += 4;
+
+            }
+
+        }
+
+    });
+
+
+    const packet = {
+
+        type:"roundResult",
+
+        round:currentRound,
+
+        caught:caught,
+
+        impostorId:impostorId,
+
+        impostorName:
+            players[impostorId]?.name || "Unknown",
+
+        eliminatedId:
+            eliminatedId,
+
+        eliminatedName:
+            eliminatedId
+            ? players[eliminatedId]?.name
+            : null,
+
+        scores:serializePlayers()
+
+    };
+
+
+    receiveRoundResult(packet);
+
+    broadcast(packet);
+
+}
+
+
+/* =========================================================
+   ROUND RESULT
+========================================================= */
+
+function receiveRoundResult(data){
+
+    clearInterval(voteTimerInterval);
+
+    const impostor =
+        players[data.impostorId];
+
+
+    if(data.caught){
+
+        $("resultIcon").textContent =
+            "🎯";
+
+        $("resultTitle").textContent =
+            "IMPOSTOR KETANGKAP!";
+
+        $("resultSub").textContent =
+            `${escapeHtml(data.impostorName)} ternyata impostornya.`;
+
+    }else{
+
+        $("resultIcon").textContent =
+            "😈";
+
+        $("resultTitle").textContent =
+            "IMPOSTOR MENANG!";
+
+        $("resultSub").textContent =
+            `${escapeHtml(data.impostorName)} berhasil nipu semua orang.`;
+
+    }
+
+
+    renderScores(data.scores);
+
+    if(isHost){
+
+        $("resultWaiting")
+            .classList.add("hidden");
+
+        if(currentRound < totalRounds){
+
+            $("nextRoundButton")
+                .classList.remove("hidden");
+
+            $("finishButton")
+                .classList.add("hidden");
+
+        }else{
+
+            $("nextRoundButton")
+                .classList.add("hidden");
+
+            $("finishButton")
+                .classList.remove("hidden");
+
+        }
+
+    }else{
+
+        $("nextRoundButton")
+            .classList.add("hidden");
+
+        $("finishButton")
+            .classList.add("hidden");
+
+        $("resultWaiting")
+            .classList.remove("hidden");
+
+    }
+
+
+    showScreen("resultScreen");
+
+}
+
+
+/* =========================================================
+   SCORE RENDER
+========================================================= */
+
+function renderScores(scorePlayers){
+
+    const box =
+        $("resultScores");
+
+    box.innerHTML = "";
+
+    [...scorePlayers]
+        .sort(
+            (a,b)=>
+                (b.score||0) -
+                (a.score||0)
+        )
+        .forEach(player=>{
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "score";
+
+            div.innerHTML = `
+
+                <div class="score-left">
+
+                    <span class="score-avatar">
+                        ${player.avatar}
+                    </span>
+
+                    <span>
+                        ${escapeHtml(player.name)}
+                    </span>
+
+                </div>
+
+                <span class="score-points">
+                    ${player.score || 0} pts
+                </span>
+
+            `;
+
+            box.appendChild(div);
+
+        });
+
+}
+
+
+/* =========================================================
+   NEXT ROUND
+========================================================= */
+
+function hostNextRound(){
+
+    if(!isHost) return;
+
+    currentRound++;
+
+    $("nextRoundButton")
+        .classList.add("hidden");
+
+    $("resultWaiting")
+        .classList.remove("hidden");
+
+    startRoundForEveryone();
+
+}
+
+
+/* =========================================================
+   FINAL
+========================================================= */
+
+function showFinal(){
+
+    if(!isHost) return;
+
+    const data = {
+
+        type:"final",
+
+        scores:serializePlayers()
+
+    };
+
+    receiveFinal(data);
+
+    broadcast(data);
+
+}
+
+
+function receiveFinal(data){
+
+    renderFinalScores(
+        data.scores
+    );
+
+    if(isHost){
+
+        $("playAgainButton")
+            .classList.remove("hidden");
+
+    }else{
+
+        $("playAgainButton")
+            .classList.add("hidden");
+
+    }
+
+    showScreen("finalScreen");
+
+}
+
+
+function renderFinalScores(scorePlayers){
+
+    const box =
+        $("finalScores");
+
+    box.innerHTML = "";
+
+    [...scorePlayers]
+        .sort(
+            (a,b)=>
+                (b.score||0) -
+                (a.score||0)
+        )
+        .forEach((player,index)=>{
+
+            const medals = [
+                "🥇",
+                "🥈",
+                "🥉"
+            ];
+
+            const medal =
+                medals[index] || "🏅";
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "score";
+
+            div.innerHTML = `
+
+                <div class="score-left">
+
+                    <span class="score-avatar">
+                        ${medal}
+                    </span>
+
+                    <span>
+                        ${escapeHtml(player.name)}
+                    </span>
+
+                </div>
+
+                <span class="score-points">
+                    ${player.score || 0} pts
+                </span>
+
+            `;
+
+            box.appendChild(div);
+
+        });
+
+}
+
+
+/* =========================================================
+   PLAY AGAIN
+========================================================= */
+
+function hostRestartMatch(){
+
+    if(!isHost) return;
+
+    currentRound = 1;
+
+    gameStarted = true;
+
+    connectedPlayers().forEach(p=>{
+        p.score = 0;
+    });
+
+    broadcast({
+
+        type:"chatSystem",
+        text:"Host memulai match baru 🔥"
+
+    });
+
+    addSystemChat(
+        "Host memulai match baru 🔥"
+    );
+
+    startRoundForEveryone();
+
+}
+
+
+/* =========================================================
+   CHAT
+========================================================= */
 
 function addSystemChat(text){
 
-    const msg = {
+    const message = {
 
-        id:
-            Date.now() +
-            Math.random(),
+        type:"chatMessage",
 
-        name:"SYSTEM",
+        id:Date.now()+"_"+Math.random(),
+
+        senderId:"system",
+
+        senderName:"",
 
         text:text,
 
@@ -2966,19 +3221,10 @@ function addSystemChat(text){
 
     };
 
+    messages.push(message);
 
-    messages.push(msg);
+    renderAllChats();
 
-    if(messages.length > 100)
-        messages.shift();
-
-
-    renderChat();
-
-
-    /*
-      Host broadcasts system messages.
-    */
 
     if(isHost){
 
@@ -2995,1728 +3241,250 @@ function addSystemChat(text){
 }
 
 
-function renderChat(){
+function sendChatFrom(inputId){
 
-    const box =
-        $("chatMessages");
+    const input =
+        $(inputId);
+
+    const text =
+        input.value.trim();
+
+    if(!text) return;
+
+    input.value = "";
+
+    const message = {
+
+        type:"chatMessage",
+
+        id:Date.now()+"_"+Math.random(),
+
+        senderId:myId,
+
+        senderName:myName,
+
+        text:text,
+
+        system:false
+
+    };
 
 
-    if(!messages.length){
+    messages.push(message);
 
-        box.innerHTML =
-            `<div class="chatEmpty">
-                Belum ada chat.<br>
-                Say hi dulu 👋
-             </div>`;
-
-        $("chatCount").textContent =
-            "0 messages";
-
-        return;
-    }
+    renderAllChats();
 
 
-    box.innerHTML = "";
+    if(isHost){
 
+        /*
+           Host:
+           tampilkan lokal + broadcast
+        */
 
-    messages.forEach(msg=>{
+        broadcast(message);
 
-        const div =
-            document.createElement("div");
+    }else{
 
+        /*
+           Guest:
+           tampilkan lokal dulu,
+           lalu kirim ke host.
 
-        if(msg.system){
+           Host akan relay ke semua player.
+        */
 
-            div.className =
-                "chatMsg";
+        const conn =
+            connections.host;
 
-            div.style.textAlign =
-                "center";
+        if(
+            conn &&
+            conn.open
+        ){
 
-            div.innerHTML =
-                `<div class="chatAuthor">
-                    ${escapeHtml(msg.text)}
-                 </div>`;
+            conn.send({
+
+                type:"chat",
+
+                text:text
+
+            });
 
         }else{
 
-            const isMe =
-                msg.name === myName;
+            showToast(
+                "Belum terhubung ke host."
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER CHAT
+========================================================= */
+
+function renderAllChats(){
+
+    const containers = [
+
+        $("lobbyChatMessages"),
+        $("gameChatMessages")
+
+    ];
+
+
+    containers.forEach(container=>{
+
+        if(!container) return;
+
+        container.innerHTML = "";
+
+        messages.forEach(message=>{
+
+            const div =
+                document.createElement("div");
+
+
+            if(message.system){
+
+                div.className =
+                    "system";
+
+                div.textContent =
+                    message.text;
+
+                container.appendChild(div);
+
+                return;
+
+            }
+
 
             div.className =
-                "chatMsg" +
-                (isMe ? " me" : "");
+                "chat-message" +
+                (
+                    message.senderId === myId
+                    ? " mine"
+                    : ""
+                );
 
 
             div.innerHTML = `
 
-                <div class="chatAuthor">
-                    ${escapeHtml(msg.name)}
+                <div class="chat-sender">
+                    ${escapeHtml(message.senderName)}
                 </div>
 
-                <div class="chatBubble">
-                    ${escapeHtml(msg.text)}
+                <div class="chat-bubble">
+                    ${escapeHtml(message.text)}
                 </div>
+
             `;
 
-        }
+            container.appendChild(div);
+
+        });
 
 
-        box.appendChild(div);
+        container.scrollTop =
+            container.scrollHeight;
 
     });
 
 
     $("chatCount").textContent =
-        messages.filter(m=>!m.system).length +
-        " messages";
-
-
-    box.scrollTop =
-        box.scrollHeight;
-
-}
-
-
-/* =========================================================
-   START MATCH
-========================================================= */
-
-function hostStartMatch(){
-
-    if(!isHost)
-        return;
-
-
-    const list =
-        playerArray()
-            .filter(p=>p.connected);
-
-
-    if(list.length < MIN_PLAYERS){
-
-        lobbyError(
-            `Minimal ${MIN_PLAYERS} pemain untuk mulai.`
+        messages.length +
+        (
+            messages.length === 1
+            ? " message"
+            : " messages"
         );
 
-        return;
-    }
-
-
-    matchStarted = true;
-
-    round = 1;
-
-
-    /*
-      Create score.
-    */
-
-    list.forEach(p=>{
-
-        p.score = 0;
-
-    });
-
-
-    gameState = {
-
-        round:1,
-
-        normalWord:"",
-
-        impostorId:"",
-
-        clues:{},
-
-        votes:{}
-
-    };
-
-
-    addSystemChat(
-        "Game dimulai! Good luck 😈"
-    );
-
-
-    startRoundForEveryone();
-
 }
 
 
 /* =========================================================
-   START ROUND
+   FLOATING CHAT
 ========================================================= */
 
-function startRoundForEveryone(){
+function updateFloatingChat(){
 
-    const list =
-        playerArray()
-            .filter(p=>p.connected);
+    const visibleScreen =
+        document.querySelector(
+            ".screen:not(.hidden)"
+        );
 
+    if(!visibleScreen){
 
-    if(list.length < MIN_PLAYERS){
-
-        endMatchBecauseDisconnect();
+        $("gameChat")
+            .classList.add("hidden");
 
         return;
-    }
-
-
-    phase = "clue";
-
-
-    const normalWord =
-        randomItem(WORDS);
-
-
-    let impostorPlayer =
-        randomItem(list);
-
-
-    /*
-      Ensure every player has a score property.
-    */
-
-    list.forEach(p=>{
-
-        if(typeof p.score !== "number")
-            p.score = 0;
-
-    });
-
-
-    gameState = {
-
-        round:round,
-
-        normalWord:normalWord,
-
-        impostorId:impostorPlayer.id,
-
-        clues:{},
-
-        votes:{}
-
-    };
-
-
-    /*
-      Every player gets:
-      normal word OR different fake word.
-    */
-
-    const fakeWord =
-        getDifferentWord(normalWord);
-
-
-    /*
-      HOST WORD
-    */
-
-    const hostWord =
-        impostorPlayer.id === "host"
-            ? fakeWord
-            : normalWord;
-
-
-    receiveStartMatch({
-
-        type:"startMatch",
-
-        round:round,
-
-        word:hostWord
-
-    });
-
-
-    /*
-      Send each guest their own secret word.
-    */
-
-    list.forEach(p=>{
-
-        if(p.isHost)
-            return;
-
-
-        const word =
-            p.id === impostorPlayer.id
-                ? fakeWord
-                : normalWord;
-
-
-        if(
-            p.conn &&
-            p.connected
-        ){
-
-            try{
-
-                p.conn.send({
-
-                    type:"startMatch",
-
-                    round:round,
-
-                    word:word
-
-                });
-
-            }catch(e){}
-
-        }
-
-    });
-
-
-    broadcastPlayers();
-
-
-    /*
-      Tell everyone chat can continue.
-    */
-
-    addSystemChat(
-        `Round ${round}/5 mulai! Semua orang kasih clue.`
-    );
-
-}
-
-
-/* =========================================================
-   DIFFERENT WORD
-========================================================= */
-
-function getDifferentWord(normal){
-
-    let word =
-        randomItem(WORDS);
-
-
-    while(word === normal){
-
-        word =
-            randomItem(WORDS);
 
     }
 
 
-    return word;
-}
-
-
-/* =========================================================
-   RECEIVE START
-========================================================= */
-
-function receiveStartMatch(data){
-
-    clearGameTimers();
-
-
-    round =
-        data.round;
-
-
-    myClue = "";
-
-    myVote = null;
-
-
-    gameState.clues = {};
-
-    gameState.votes = {};
-
-
-    $("roundNumber").textContent =
-        round;
-
-
-    $("secretWord").textContent =
-        data.word;
-
-
-    $("clueInput").value =
-        "";
-
-
-    $("clueInput").disabled =
-        false;
-
-
-    $("sendClueBtn").disabled =
-        false;
-
-
-    $("clueList").innerHTML =
-        "";
-
-
-    phase = "clue";
-
-
-    showScreen("clueScreen");
-
-
-    startClueTimer();
-
-
-    updateClueStatus();
-
-}
-
-
-/* =========================================================
-   CLUE TIMER
-========================================================= */
-
-function startClueTimer(){
-
-    clearInterval(clueTimer);
-
-    clueSecondsLeft =
-        CLUE_SECONDS;
-
-
-    updateClueTimer();
-
-
-    clueTimer =
-        setInterval(()=>{
-
-            clueSecondsLeft--;
-
-            updateClueTimer();
-
-
-            if(clueSecondsLeft <= 0){
-
-                clearInterval(clueTimer);
-
-
-                /*
-                  Automatically submit "..." if
-                  player didn't send a clue.
-                */
-
-                if(!myClue){
-
-                    submitClue(true);
-
-                }
-
-            }
-
-        },1000);
-
-}
-
-
-function updateClueTimer(){
-
-    $("clueTimer").textContent =
-        clueSecondsLeft;
-
-
-    $("clueProgress").style.width =
-        (clueSecondsLeft /
-            CLUE_SECONDS *
-            100) +
-        "%";
-
-}
-
-
-/* =========================================================
-   SUBMIT CLUE
-========================================================= */
-
-function submitClue(auto=false){
-
-    if(myClue)
-        return;
-
-
-    let text =
-        $("clueInput")
-            .value
-            .trim();
-
-
-    if(!text){
-
-        if(auto){
-
-            text = "...";
-
-        }else{
-
-            $("clueStatus").textContent =
-                "Kasih clue dulu.";
-
-            return;
-        }
-
-    }
-
-
-    myClue =
-        text.slice(0,100);
-
-
-    $("clueInput").disabled =
-        true;
-
-
-    $("sendClueBtn").disabled =
-        true;
-
-
-    /*
-      HOST
-    */
-
-    if(isHost){
-
-        gameState.clues["host"] =
-            myClue;
-
-
-        broadcast({
-            type:"cluesUpdate",
-            clues:gameState.clues
-        });
-
-
-        renderClueList();
-
-        updateClueStatus();
-
-        checkAllClues();
-
-        return;
-    }
-
-
-    /*
-      GUEST
-    */
+    const allowed = [
+
+        "lobbyScreen",
+        "clueScreen",
+        "voteScreen",
+        "resultScreen",
+        "finalScreen"
+
+    ];
 
     if(
-        myConn &&
-        myConn.open
+        allowed.includes(
+            visibleScreen.id
+        )
     ){
 
-        myConn.send({
-
-            type:"clue",
-
-            clue:myClue
-
-        });
-
-    }
-
-}
-
-
-/* =========================================================
-   CLUE LIST
-========================================================= */
-
-function renderClueList(){
-
-    const box =
-        $("clueList");
-
-
-    box.innerHTML = "";
-
-
-    const list =
-        playerArray()
-            .filter(p=>p.connected);
-
-
-    list.forEach(p=>{
-
-        const item =
-            document.createElement("div");
-
-
-        item.className =
-            "clueItem";
-
-
-        const clue =
-            gameState.clues[p.id];
-
-
-        item.innerHTML = `
-
-            <div class="clueAuthor">
-                ${avatarFor(
-                    playerArray().indexOf(p)
-                )}
-                ${escapeHtml(p.name)}
-            </div>
-
-            <div class="${
-                clue
-                    ? "clueText"
-                    : "clueWaiting"
-            }">
-
-                ${
-                    clue
-                        ? escapeHtml(clue)
-                        : "Writing clue..."
-                }
-
-            </div>
-
-        `;
-
-
-        box.appendChild(item);
-
-    });
-
-}
-
-
-function updateClueStatus(){
-
-    const total =
-        playerArray()
-            .filter(p=>p.connected)
-            .length;
-
-
-    const submitted =
-        Object.keys(
-            gameState.clues
-        ).filter(id=>{
-
-            const p =
-                players[id];
-
-            return p &&
-                p.connected &&
-                gameState.clues[id];
-
-        }).length;
-
-
-    $("clueStatus").textContent =
-        `${submitted}/${total} players have submitted`;
-
-
-    renderClueList();
-
-}
-
-
-/* =========================================================
-   CHECK ALL CLUES
-========================================================= */
-
-function checkAllClues(){
-
-    const list =
-        playerArray()
-            .filter(p=>p.connected);
-
-
-    const allSubmitted =
-        list.every(
-            p=>gameState.clues[p.id]
-        );
-
-
-    if(!allSubmitted)
-        return;
-
-
-    clearInterval(clueTimer);
-
-
-    setTimeout(()=>{
-
-        startVoting();
-
-    },700);
-
-}
-
-
-/* =========================================================
-   START VOTING
-========================================================= */
-
-function startVoting(){
-
-    phase = "vote";
-
-
-    const list =
-        playerArray()
-            .filter(p=>p.connected);
-
-
-    const payload = {
-
-        type:"beginVote",
-
-        round:round,
-
-        clues:gameState.clues,
-
-        players:serializePlayers()
-
-    };
-
-
-    /*
-      Host opens locally.
-    */
-
-    receiveVoteStart(payload);
-
-
-    /*
-      Send to guests.
-    */
-
-    broadcast(payload);
-
-}
-
-
-/* =========================================================
-   RECEIVE VOTE START
-========================================================= */
-
-function receiveVoteStart(data){
-
-    clearGameTimers();
-
-
-    phase = "vote";
-
-
-    gameState.clues =
-        data.clues || {};
-
-
-    gameState.votes =
-        {};
-
-
-    myVote = null;
-
-
-    renderVoteClues();
-
-
-    renderVoteChoices(
-        data.players ||
-        serializePlayers()
-    );
-
-
-    showScreen("voteScreen");
-
-
-    startVoteTimer();
-
-}
-
-
-/* =========================================================
-   VOTE CLUES
-========================================================= */
-
-function renderVoteClues(){
-
-    const box =
-        $("voteClues");
-
-
-    box.innerHTML = "";
-
-
-    const list =
-        playerArray()
-            .filter(p=>p.connected);
-
-
-    list.forEach(p=>{
-
-        const div =
-            document.createElement("div");
-
-
-        div.className =
-            "clueItem";
-
-
-        div.innerHTML = `
-
-            <div class="clueAuthor">
-                ${avatarFor(
-                    playerArray().indexOf(p)
-                )}
-                ${escapeHtml(p.name)}
-            </div>
-
-            <div class="clueText">
-                ${
-                    gameState.clues[p.id]
-                        ? escapeHtml(
-                            gameState.clues[p.id]
-                        )
-                        : "..."
-                }
-            </div>
-
-        `;
-
-
-        box.appendChild(div);
-
-    });
-
-}
-
-
-/* =========================================================
-   VOTE CHOICES
-========================================================= */
-
-function renderVoteChoices(list){
-
-    const box =
-        $("voteGrid");
-
-
-    box.innerHTML = "";
-
-
-    list =
-        list.filter(p=>p.connected);
-
-
-    list.forEach((p,index)=>{
-
-        /*
-          Don't allow voting yourself.
-        */
-
-        if(p.id === myId)
-            return;
-
-
-        /*
-          Host's internal ID is "host".
-        */
-
-        if(
-            isHost &&
-            p.id === "host"
-        ){
-
-            /*
-              Host should also not vote himself.
-            */
-
-            return;
-
-        }
-
-
-        const button =
-            document.createElement("button");
-
-
-        button.className =
-            "voteBtn";
-
-
-        button.innerHTML = `
-
-            <div class="voteAvatar">
-                ${avatarFor(index)}
-            </div>
-
-            <div>
-
-                <div class="voteName">
-                    ${escapeHtml(p.name)}
-                </div>
-
-                <div class="voteSub">
-                    TAP TO VOTE
-                </div>
-
-            </div>
-
-        `;
-
-
-        button.onclick =
-            ()=>{
-                submitVote(p.id);
-            };
-
-
-        box.appendChild(button);
-
-    });
-
-
-    /*
-      If host isn't shown because self was filtered,
-      guests similarly won't see themselves.
-    */
-
-}
-
-
-/* =========================================================
-   VOTE TIMER
-========================================================= */
-
-function startVoteTimer(){
-
-    clearInterval(voteTimer);
-
-
-    voteSecondsLeft =
-        VOTE_SECONDS;
-
-
-    updateVoteTimer();
-
-
-    voteTimer =
-        setInterval(()=>{
-
-            voteSecondsLeft--;
-
-            updateVoteTimer();
-
-
-            if(voteSecondsLeft <= 0){
-
-                clearInterval(voteTimer);
-
-
-                if(myVote === null){
-
-                    /*
-                      Pick a random opponent.
-                    */
-
-                    const candidates =
-                        playerArray()
-                            .filter(p=>
-                                p.connected &&
-                                p.id !== myId
-                            );
-
-
-                    if(candidates.length){
-
-                        submitVote(
-                            randomItem(
-                                candidates
-                            ).id
-                        );
-
-                    }
-
-                }
-
-            }
-
-        },1000);
-
-}
-
-
-function updateVoteTimer(){
-
-    $("voteTimer").textContent =
-        voteSecondsLeft;
-
-
-    $("voteProgress").style.width =
-        (voteSecondsLeft /
-            VOTE_SECONDS *
-            100) +
-        "%";
-
-}
-
-
-/* =========================================================
-   SUBMIT VOTE
-========================================================= */
-
-function submitVote(targetId){
-
-    if(myVote !== null)
-        return;
-
-
-    myVote =
-        targetId;
-
-
-    document.querySelectorAll(".voteBtn")
-        .forEach(btn=>{
-
-            btn.disabled = true;
-
-            btn.style.opacity = ".45";
-
-        });
-
-
-    $("voteStatus")
-        .classList
-        .remove("hidden");
-
-
-    clearInterval(voteTimer);
-
-
-    /*
-      HOST
-    */
-
-    if(isHost){
-
-        gameState.votes["host"] =
-            targetId;
-
-
-        broadcast({
-            type:"votesUpdate",
-            votes:gameState.votes
-        });
-
-
-        checkAllVotes();
-
-        return;
-    }
-
-
-    /*
-      GUEST
-    */
-
-    if(
-        myConn &&
-        myConn.open
-    ){
-
-        myConn.send({
-
-            type:"vote",
-
-            vote:targetId
-
-        });
-
-    }
-
-}
-
-
-/* =========================================================
-   CHECK ALL VOTES
-========================================================= */
-
-function checkAllVotes(){
-
-    const list =
-        playerArray()
-            .filter(p=>p.connected);
-
-
-    const allVoted =
-        list.every(
-            p=>gameState.votes[p.id]
-        );
-
-
-    if(!allVoted)
-        return;
-
-
-    clearInterval(voteTimer);
-
-
-    setTimeout(()=>{
-
-        calculateRoundResult();
-
-    },500);
-
-}
-
-
-/* =========================================================
-   CALCULATE ROUND RESULT
-========================================================= */
-
-function calculateRoundResult(){
-
-    const list =
-        playerArray()
-            .filter(p=>p.connected);
-
-
-    const votes =
-        gameState.votes;
-
-
-    const tally = {};
-
-
-    Object.values(votes)
-        .forEach(target=>{
-
-            if(!target)
-                return;
-
-
-            tally[target] =
-                (tally[target] || 0) + 1;
-
-        });
-
-
-    let maxVotes = 0;
-
-
-    Object.values(tally)
-        .forEach(n=>{
-
-            if(n > maxVotes)
-                maxVotes = n;
-
-        });
-
-
-    /*
-      Find all tied highest.
-    */
-
-    const highest =
-        Object.keys(tally)
-            .filter(
-                id=>tally[id] === maxVotes
-            );
-
-
-    let eliminated = null;
-
-
-    /*
-      Tie = nobody eliminated.
-    */
-
-    if(highest.length === 1){
-
-        eliminated =
-            highest[0];
-
-    }
-
-
-    const impostorId =
-        gameState.impostorId;
-
-
-    const caught =
-        eliminated === impostorId;
-
-
-    let impostorWins =
-        !caught;
-
-
-    /*
-      SCORE SYSTEM
-    */
-
-    if(caught){
-
-        /*
-          Every non-impostor gets +2.
-          Person who voted impostor correctly gets +1 bonus.
-        */
-
-        list.forEach(p=>{
-
-            if(p.id !== impostorId){
-
-                p.score =
-                    (p.score || 0) + 2;
-
-            }
-
-        });
-
-
-        Object.entries(votes)
-            .forEach(([voter,target])=>{
-
-                if(target === impostorId){
-
-                    const p =
-                        players[voter];
-
-                    if(p){
-
-                        p.score =
-                            (p.score || 0) + 1;
-
-                    }
-
-                }
-
-            });
+        $("gameChat")
+            .classList.remove("hidden");
 
     }else{
 
-        /*
-          Impostor gets +4.
-        */
-
-        const imp =
-            players[impostorId];
-
-
-        if(imp){
-
-            imp.score =
-                (imp.score || 0) + 4;
-
-        }
+        $("gameChat")
+            .classList.add("hidden");
 
     }
 
-
-    const impostorPlayer =
-        players[impostorId];
+}
 
 
-    const eliminatedPlayer =
-        eliminated
-            ? players[eliminated]
-            : null;
+function toggleGameChat(){
 
-
-    const result = {
-
-        type:"roundResult",
-
-        round:round,
-
-        caught:caught,
-
-        impostorId:impostorId,
-
-        impostorName:
-            impostorPlayer
-                ? impostorPlayer.name
-                : "Unknown",
-
-        eliminatedId:
-            eliminated,
-
-        eliminatedName:
-            eliminatedPlayer
-                ? eliminatedPlayer.name
-                : null,
-
-        tally:tally,
-
-        scores:serializeScores()
-
-    };
-
-
-    receiveRoundResult(result);
-
-    broadcast(result);
+    $("gameChatPanel")
+        .classList.toggle("hidden");
 
 }
 
 
 /* =========================================================
-   SCORES
-========================================================= */
-
-function serializeScores(){
-
-    return playerArray()
-        .map(p=>({
-
-            id:p.id,
-
-            name:p.name,
-
-            score:p.score || 0
-
-        }));
-
-}
-
-
-function renderScoreList(
-    elementId,
-    scores
-){
-
-    const box =
-        $(elementId);
-
-
-    box.innerHTML = "";
-
-
-    const sorted =
-        [...scores]
-            .sort(
-                (a,b)=>
-                    b.score-a.score
-            );
-
-
-    sorted.forEach((p,index)=>{
-
-        const row =
-            document.createElement("div");
-
-
-        row.className =
-            "scoreRow";
-
-
-        row.innerHTML = `
-
-            <div class="scorePlayer">
-
-                <span>
-                    ${
-                        index === 0
-                            ? "👑"
-                            : "👤"
-                    }
-                </span>
-
-                <span>
-                    ${escapeHtml(p.name)}
-                </span>
-
-            </div>
-
-            <div class="scoreValue">
-                ${p.score}
-            </div>
-
-        `;
-
-
-        box.appendChild(row);
-
-    });
-
-}
-
-
-/* =========================================================
-   ROUND RESULT
-========================================================= */
-
-function receiveRoundResult(data){
-
-    clearGameTimers();
-
-    phase = "result";
-
-
-    if(data.caught){
-
-        $("roundResultIcon").textContent =
-            "🎯";
-
-
-        $("roundResultSub").textContent =
-            "The impostor got caught!";
-
-
-        $("roundResultText").innerHTML = `
-
-            <b>${escapeHtml(
-                data.impostorName
-            )}</b>
-            was the impostor.
-
-            ${
-                data.eliminatedName
-                    ? `<br>
-                       <b>${escapeHtml(
-                           data.eliminatedName
-                       )}</b>
-                       was voted out.`
-                    : ""
-            }
-
-        `;
-
-    }else{
-
-        $("roundResultIcon").textContent =
-            "😈";
-
-
-        $("roundResultSub").textContent =
-            "The impostor survived!";
-
-
-        if(data.eliminatedName){
-
-            $("roundResultText").innerHTML = `
-
-                <b>${escapeHtml(
-                    data.impostorName
-                )}</b>
-                was the impostor.
-
-                <br>
-                But the players voted
-                <b>${escapeHtml(
-                    data.eliminatedName
-                )}</b>
-                instead.
-
-            `;
-
-        }else{
-
-            $("roundResultText").innerHTML = `
-
-                <b>${escapeHtml(
-                    data.impostorName
-                )}</b>
-                was the impostor.
-
-                <br>
-                The vote ended in a tie.
-
-            `;
-
-        }
-
-    }
-
-
-    renderScoreList(
-        "roundScoreList",
-        data.scores
-    );
-
-
-    if(isHost){
-
-        $("nextRoundBtn")
-            .classList
-            .remove("hidden");
-
-        $("nextRoundWaiting")
-            .classList
-            .add("hidden");
-
-    }else{
-
-        $("nextRoundBtn")
-            .classList
-            .add("hidden");
-
-        $("nextRoundWaiting")
-            .classList
-            .remove("hidden");
-
-    }
-
-
-    showScreen("resultScreen");
-
-}
-
-
-/* =========================================================
-   NEXT ROUND
-========================================================= */
-
-function hostNextRound(){
-
-    if(!isHost)
-        return;
-
-
-    if(round >= TOTAL_ROUNDS){
-
-        finishMatch();
-
-        return;
-
-    }
-
-
-    round++;
-
-
-    broadcast({
-        type:"newRound",
-        round:round
-    });
-
-
-    startRoundForEveryone();
-
-}
-
-
-/* =========================================================
-   RECEIVE NEW ROUND
-========================================================= */
-
-function receiveNewRound(data){
-
-    round =
-        data.round;
-
-}
-
-
-/* =========================================================
-   FINISH MATCH
-========================================================= */
-
-function finishMatch(){
-
-    clearGameTimers();
-
-
-    const scores =
-        serializeScores();
-
-
-    const sorted =
-        [...scores]
-            .sort(
-                (a,b)=>
-                    b.score-a.score
-            );
-
-
-    const winner =
-        sorted[0];
-
-
-    const result = {
-
-        type:"finalResult",
-
-        winner:winner,
-
-        scores:scores
-
-    };
-
-
-    receiveFinalResult(result);
-
-    broadcast(result);
-
-}
-
-
-/* =========================================================
-   FINAL RESULT
-========================================================= */
-
-function receiveFinalResult(data){
-
-    clearGameTimers();
-
-    phase = "final";
-
-
-    $("finalWinnerName").textContent =
-        data.winner.name;
-
-
-    $("finalWinnerIcon").textContent =
-        "👑";
-
-
-    renderScoreList(
-        "finalScoreList",
-        data.scores
-    );
-
-
-    if(isHost){
-
-        $("finalRestartBtn")
-            .classList
-            .remove("hidden");
-
-        $("finalGuestWait")
-            .classList
-            .add("hidden");
-
-    }else{
-
-        $("finalRestartBtn")
-            .classList
-            .add("hidden");
-
-        $("finalGuestWait")
-            .classList
-            .remove("hidden");
-
-    }
-
-
-    showScreen("finalScreen");
-
-}
-
-
-/* =========================================================
-   RESTART MATCH
-========================================================= */
-
-function hostRestartMatch(){
-
-    if(!isHost)
-        return;
-
-
-    round = 1;
-
-    matchStarted = true;
-
-
-    playerArray().forEach(p=>{
-
-        p.score = 0;
-
-    });
-
-
-    broadcast({
-        type:"chatSystem",
-        text:"New match starting! 🔥"
-    });
-
-
-    addSystemChat(
-        "New match starting! 🔥"
-    );
-
-
-    startRoundForEveryone();
-
-}
-
-
-/* =========================================================
-   DISCONNECT END
-========================================================= */
-
-function endMatchBecauseDisconnect(){
-
-    clearGameTimers();
-
-
-    if(isHost){
-
-        lobbyError(
-            "Terlalu sedikit pemain yang tersisa."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   LEAVE
+   LEAVE ROOM
 ========================================================= */
 
 function leaveRoom(){
 
-    clearGameTimers();
+    clearInterval(clueTimerInterval);
+    clearInterval(voteTimerInterval);
 
-    cleanupPeerOnly();
+    Object.values(connections)
+        .forEach(conn=>{
 
+            try{
+                conn.close();
+            }catch(e){}
 
-    isHost = false;
-
-    connected = false;
-
-    matchStarted = false;
-
-    players = {};
-
-    messages = {};
-
-    roomCode = "";
-
-    myName = "";
+        });
 
 
-    $("homeName").value =
-        "";
-
-    $("joinCode").value =
-        "";
-
-
-    showScreen("home");
-
-}
-
-
-/* =========================================================
-   CLEANUP PEER
-========================================================= */
-
-function cleanupPeerOnly(){
-
-    if(myConn){
-
-        try{
-            myConn.close();
-        }catch(e){}
-
-        myConn = null;
-
-    }
-
+    connections = {};
 
     if(peer){
 
@@ -4724,120 +3492,112 @@ function cleanupPeerOnly(){
             peer.destroy();
         }catch(e){}
 
-        peer = null;
-
     }
 
+    peer = null;
 
-    connected = false;
+    players = {};
+
+    messages = [];
+
+    clues = {};
+    votes = {};
+
+    roomCode = "";
+    hostPeerId = "";
+    myId = "";
+    myName = "";
+
+    isHost = false;
+    gameStarted = false;
+
+    $("gameChat")
+        .classList.add("hidden");
+
+    $("gameChatPanel")
+        .classList.add("hidden");
+
+    showHome();
 
 }
 
 
 /* =========================================================
-   CLEAR TIMERS
+   ESCAPE HTML
 ========================================================= */
 
-function clearGameTimers(){
+function escapeHtml(value){
 
-    if(clueTimer){
-
-        clearInterval(
-            clueTimer
-        );
-
-        clueTimer = null;
-
-    }
-
-
-    if(voteTimer){
-
-        clearInterval(
-            voteTimer
-        );
-
-        voteTimer = null;
-
-    }
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 
 }
 
 
 /* =========================================================
-   INPUT EVENTS
+   ENTER TO SEND CHAT
 ========================================================= */
 
-$("joinCode")
-    .addEventListener(
-        "input",
-        e=>{
+[
+    "lobbyChatInput",
+    "gameChatInput"
+].forEach(id=>{
 
-            e.target.value =
-                e.target.value
-                    .toUpperCase()
-                    .replace(
-                        /[^A-Z0-9]/g,
-                        ""
-                    )
-                    .slice(0,5);
-
-        }
-    );
-
-
-$("homeName")
-    .addEventListener(
+    $(id).addEventListener(
         "keydown",
         e=>{
 
-            if(e.key === "Enter"){
-
-                createRoom();
-
-            }
-
-        }
-    );
-
-
-$("joinCode")
-    .addEventListener(
-        "keydown",
-        e=>{
-
-            if(e.key === "Enter"){
-
-                joinRoom();
-
-            }
-
-        }
-    );
-
-
-$("chatInput")
-    .addEventListener(
-        "keydown",
-        e=>{
-
-            if(e.key === "Enter"){
+            if(
+                e.key === "Enter" &&
+                !e.shiftKey
+            ){
 
                 e.preventDefault();
 
-                sendChat();
+                sendChatFrom(id);
 
             }
 
         }
     );
 
+});
+
 
 /* =========================================================
-   INITIAL
+   JOIN CODE FORMAT
 ========================================================= */
 
-showScreen("home");
+$("joinCode").addEventListener(
+    "input",
+    e=>{
+
+        e.target.value =
+            e.target.value
+                .toUpperCase()
+                .replace(/[^A-Z0-9]/g,"")
+                .slice(0,5);
+
+    }
+);
+
+
+/* =========================================================
+   AUTO JOIN INVITE
+========================================================= */
+
+window.addEventListener(
+    "load",
+    ()=>{
+
+        checkInviteLink();
+
+    }
+);
 
 </script>
 

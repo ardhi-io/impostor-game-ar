@@ -1340,7 +1340,15 @@ function createHostPeer(){
 
   const peerId = "impostor-" + roomCode.toLowerCase();
 
-  peer = new Peer(peerId);
+  peer = new Peer(peerId,{
+    config:{
+      iceServers:[
+        {urls:"stun:stun.l.google.com:19302"},
+        {urls:"stun:stun1.l.google.com:19302"},
+        {urls:"stun:stun2.l.google.com:19302"}
+      ]
+    }
+  });
 
   peer.on("open",()=>{
     showLobby();
@@ -1386,6 +1394,50 @@ function setupHostConnection(conn){
       hostId:myId,
       roomCode
     });
+
+    /*
+      Kalau player tersambung ketika game sudah berjalan,
+      langsung sinkronkan state game ke player tersebut.
+    */
+
+    if(
+      gamePhase !== "lobby" &&
+      currentRoundState
+    ){
+
+      const player =
+        players.find(p=>p.id === conn.peer);
+
+      if(player){
+
+        const isImpostor =
+          player.id === currentRoundState.impostorId;
+
+        conn.send({
+          type:"roundStart",
+          round:currentRoundState.round,
+          phase:currentRoundState.phase,
+          activeIds:currentRoundState.activeIds,
+          clues:currentRoundState.clues || [],
+          endsAt:currentRoundState.endsAt,
+          word:isImpostor
+            ? currentRoundState.impostorWord
+            : currentRoundState.normalWord,
+          isImpostor
+        });
+
+        if(gamePhase === "vote"){
+
+          conn.send({
+            type:"voteStart",
+            clues:currentRoundState.clues || [],
+            endsAt:currentRoundState.endsAt,
+            activeIds:currentRoundState.activeIds
+          });
+
+        }
+      }
+    }
   });
 
 
@@ -1514,6 +1566,22 @@ function acceptGuest(conn,data){
 
 
   syncLateJoiner(conn,player);
+
+
+  /*
+    Tambahan sinkronisasi supaya player yang join
+    tepat ketika game sedang dimulai tidak tertinggal
+    di lobby.
+  */
+
+  conn.send({
+    type:"syncState",
+    players:players.filter(p=>p.connected),
+    scores:{...scores},
+    phase:gamePhase,
+    round:currentRound,
+    roundState:currentRoundState
+  });
 }
 
 
@@ -1541,7 +1609,14 @@ function syncLateJoiner(conn,player){
     }
 
 
-    const isImpostor = player.id === currentRoundState.impostorId;
+    /*
+      Player yang baru join di tengah ronde
+      bukan impostor ronde yang sedang berjalan.
+    */
+
+    const isImpostor =
+      player.id === currentRoundState.impostorId;
+
 
     conn.send({
       type:"roundStart",
@@ -1615,7 +1690,15 @@ function joinRoom(){
   myId = crypto.randomUUID();
 
 
-  peer = new Peer();
+  peer = new Peer(undefined,{
+    config:{
+      iceServers:[
+        {urls:"stun:stun.l.google.com:19302"},
+        {urls:"stun:stun1.l.google.com:19302"},
+        {urls:"stun:stun2.l.google.com:19302"}
+      ]
+    }
+  });
 
 
   peer.on("open",()=>{
@@ -1833,6 +1916,59 @@ function handleGuestPacket(data){
     case "syncState":
 
       receiveSyncState(data);
+
+      /*
+        Kalau host sudah berada dalam ronde,
+        langsung masuk ke game dan sinkronkan timer/state.
+      */
+
+      if(
+        data.phase &&
+        data.phase !== "lobby" &&
+        data.roundState
+      ){
+
+        const state = data.roundState;
+
+        currentRoundState = state;
+
+        currentRound = state.round;
+
+        gamePhase = state.phase;
+
+        currentEndsAt = state.endsAt;
+
+        clues = state.clues || [];
+
+        /*
+          Ambil role/word dari state kalau tersedia.
+          Kalau roundStart sudah diterima sebelumnya,
+          data tersebut tetap dipertahankan.
+        */
+
+        if(state.impostorId === myId){
+
+          myIsImpostor = true;
+
+          myWord = state.impostorWord || myWord;
+
+        }else{
+
+          myIsImpostor = false;
+
+          myWord = state.normalWord || myWord;
+        }
+
+        showScreen("gameScreen");
+
+        renderGameHeader();
+
+        renderRole();
+
+        renderGameArea();
+
+        startTimer();
+      }
 
       break;
 
@@ -3039,13 +3175,13 @@ function receiveFinalResult(data){
 
     actions.innerHTML = `
 
+      <div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:12px">
+        Menunggu host memulai game lagi...
+      </div>
+
       <button class="btn ghost" onclick="backToHome()">
         BACK TO HOME
       </button>
-
-      <div style="text-align:center;color:var(--muted);font-size:12px;margin-top:9px">
-        Menunggu host memulai game lagi...
-      </div>
     `;
   }
 }
@@ -3092,8 +3228,7 @@ function backToHome(){
 
   }catch(e){}
 
-  location.href =
-    location.pathname;
+  location.href = location.pathname;
 }
 
 
